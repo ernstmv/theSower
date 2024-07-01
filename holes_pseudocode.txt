@@ -1,0 +1,17 @@
+    def detect_holes(self):
+        Perform image processing to detect the holes in the tray
+        - Apply Gaussian blur to the image
+        - Convert the image to HSV color space
+        - Create a mask for the desired color range (blue)
+        - Find contours in the mask and filter based on size
+        - Find the center of each hole and check if it lies within the tray contour
+        - Draw rectangles around the holes and store their centers
+        - Call find_missing_points() to identify missing points in the grid
+
+    def find_missing_points(self):
+        Identify missing points in the grid formed by the holes
+        - Sort the hole centers based on their x-coordinate
+        - Create a matrix of rows, where each row contains consecutive holes
+        - Calculate the mean distance between consecutive holes in each row
+        - Identify missing points by comparing the distances between holes and the mean distance
+        - Store the missing points for further processing
