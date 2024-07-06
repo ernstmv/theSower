@@ -86,7 +86,7 @@ class ConfigWindow(CTkToplevel):
 
     def get_robot_ports(self):
         self.master.robot.get_ports()
-        self.robot_menu.configure(values=self.master.robot.available_ports)
+        self.robot_menu.configure(values=self.master.robot.a_prts)
 
     def select_robot_port(self, choice):
         self.master.robot.set_port(choice)

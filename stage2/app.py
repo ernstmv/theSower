@@ -89,14 +89,21 @@ class App(CTk):
 
     def robot_on(self):
         self.state_frame.on_robot()
+        self.controls_frame.robot_to_off()
+        self.robot.is_connected = True
+        self.set_message(f'Robot connected at {self.robot.port}')
 
     def robot_off(self):
         self.state_frame.off_robot()
+        self.controls_frame.robot_to_on()
+        self.robot.is_connected = False
+        self.set_message('Robot disconnected')
 
     def connect_robot(self):
         self.robot.connect_robot()
 
     def disconnect_robot(self):
+        self.robot_off()
         self.robot = Robot(self)
 
     # --------------FRAME-METHODS----------------------------------
@@ -111,3 +118,12 @@ class App(CTk):
 
     def set_message(self, message):
         self.log_frame.set_message(message)
+
+    def set_x_coord(self, x):
+        self.coordinates_frame.set_x(x)
+
+    def set_y_coord(self, y):
+        self.coordinates_frame.set_y(y)
+
+    def set_z_coord(self, z):
+        self.coordinates_frame.set_z(z)

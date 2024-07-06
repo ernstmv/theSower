@@ -81,7 +81,6 @@ class Camera:
 
         self.get_ports()
         for device, port in self.available_cameras:
-            print(port)
             if port in ('/dev/video3', '/dev/video2'):
                 self.set_port(port)
                 self.set_device(device)

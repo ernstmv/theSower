@@ -1,6 +1,7 @@
-import serial.tools.list_ports
-from serial import Serial, SerialException
 from time import sleep
+from threading import Thread
+import serial.tools.list_ports as s
+from serial import Serial, SerialException
 
 
 class Robot:
@@ -12,46 +13,81 @@ class Robot:
 
     def __init__(self, master):
         self.master = master
-        self.available_ports = []
+        self.a_prts = []
         self.port = None
         self.robot = None
+        self.is_connected = False
 
     def get_ports(self):
-        self.available_ports = []
-        ports = serial.tools.list_ports.comports()
-
-        for port in ports:
-            if "tty" in port.description:
-                self.available_ports.append(port.device)
+        '''GET THE AVAILABLE SERIAL PORTS AND SAVES THEM IN A LIST'''
+        self.a_prts = [prt.device for prt in s.comports() if 'tty' in prt.description]
 
     def set_port(self, port):
+        '''SETS THE ROBOT PORT'''
         self.port = port
 
+    def robot_on(self):
+        self.master.robot_on()
+        Thread(target=self.communicate).start()
+
+    def robot_off(self):
+        self.master.robot_off()
+
     def connect_robot(self):
+
+        '''TRY TO CONNECT, IF THEN UPDATES UI, ELSE THROWS ERROR'''
+
         try:
             self.robot = Serial(self.port, 115200, timeout=0.1)
             sleep(3)
-            self.master.robot_on()
-            self.master.controls_frame.robot_to_off()
-            self.master.set_message(f'Robot connected at {self.port}')
-        except SerialException:
-            self.master.set_message(
-                    f'Unable to connect with robot at port {self.port}')
-            self.port = None
-            self.master.robot_off()
-            self.master.controls_frame.robot_to_on()
+            self.robot_on()
+        except (SerialException, AttributeError):
+            self.master.set_message(f'Cant connect robot at port {self.port}')
+            self.robot_off()
 
     def autoconnect(self):
+
+        '''TRY TO CONNECT TO THE FIRST PORT IF IT IS'''
+
         self.get_ports()
-        if len(self.available_ports) > 0:
-            self.set_port(self.available_ports[0])
+        if self.a_prts:
+            self.set_port(self.a_prts[0])
             self.connect_robot()
-            return None
-        self.master.set_message('No serial devices available')
-        return None
+        else:
+            self.master.set_message('No serial devices found')
 
     def read_serial(self):
-        pass
+
+        '''READS THE SERIAL BUFFER'''
+
+        if self.is_connected:
+            try:
+                return self.robot.readline().decode('utf-8').strip()
+            except (SerialException, AttributeError):
+                self.robot_off()
+        return None
 
     def write_serial(self, mssg):
-        pass
+
+        '''WRITES IN THE SERIAL BUFFER'''
+        if self.is_connected:
+            try:
+                self.robot.write(f'{mssg}\n'.encode())
+                self.robot.flush()
+            except OSError:
+                self.robot_off()
+
+    def communicate(self):
+        while self.is_connected:
+            self.update_coordinates()
+            sleep(0.1)
+        print('Hilo terminado')
+
+    def update_coordinates(self):
+        self.write_serial('?')
+        resp = self.read_serial()
+        if resp is not None and 'MPos' in resp:
+            xax, yax, zax = resp.split('|')[1].split(':')[1].split(',')
+            self.master.set_x_coord(xax)
+            self.master.set_y_coord(yax)
+            self.master.set_z_coord(zax)
