@@ -60,8 +60,8 @@ class VideoFrame(CTkFrame):
         READS AN DEFAULT IMAGE TO SHOW UNTIL CAMERA IS CONNECTED
         '''
 
-        scale = 1
-        img = imread('/home/ernstmv/theSower/stage2/.theme/default.jpeg')
+        scale = 0.8
+        img = imread('/home/ernstmv/theSower/stage2/.theme/default.jpg')
         height, width = img.shape[:2]
         new_size = (int(width*scale), int(height*scale))
         img = resize(img, new_size, interpolation=INTER_AREA)

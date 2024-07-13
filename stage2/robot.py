@@ -1,5 +1,4 @@
 from time import sleep
-from threading import Thread
 import serial.tools.list_ports as s
 from serial import Serial, SerialException
 
@@ -17,10 +16,13 @@ class Robot:
         self.port = None
         self.robot = None
         self.is_connected = False
+        self.busy = False
+        self.master.bind("<KeyPress>", self.send_command)
 
     def get_ports(self):
         '''GET THE AVAILABLE SERIAL PORTS AND SAVES THEM IN A LIST'''
-        self.a_prts = [prt.device for prt in s.comports() if 'tty' in prt.description]
+        self.a_prts = [
+                p.device for p in s.comports() if 'tty' in p.description]
 
     def set_port(self, port):
         '''SETS THE ROBOT PORT'''
@@ -28,7 +30,22 @@ class Robot:
 
     def robot_on(self):
         self.master.robot_on()
-        Thread(target=self.communicate).start()
+        self.unlock()
+        self.standard()
+        self.update_coordinates()
+
+    def unlock(self):
+        self.write_serial('$X')
+        resp = self.read_serial()
+        while 'Unlocked' not in resp:
+            self.write_serial('$X')
+            resp = self.read_serial()
+        self.master.set_message('Robot unlocked')
+
+    def standard(self):
+        self.write_serial('G91')
+        if 'ok' in self.read_serial():
+            self.master.set_message('Relative coordinates mode')
 
     def robot_off(self):
         self.master.robot_off()
@@ -39,7 +56,7 @@ class Robot:
 
         try:
             self.robot = Serial(self.port, 115200, timeout=0.1)
-            sleep(3)
+            sleep(2)
             self.robot_on()
         except (SerialException, AttributeError):
             self.master.set_message(f'Cant connect robot at port {self.port}')
@@ -60,28 +77,60 @@ class Robot:
 
         '''READS THE SERIAL BUFFER'''
 
-        if self.is_connected:
+        if self.is_connected and not self.busy:
+            self.robot.reset_input_buffer()
+            self.busy = True
             try:
-                return self.robot.readline().decode('utf-8').strip()
+                resp = self.robot.readline().decode('utf-8').strip()
+                if resp is not None and 'Alarm' in resp:
+                    self.master.set_message("Alarm detected, robot blocked")
+                    self.robot_off()
+                return resp
             except (SerialException, AttributeError):
                 self.robot_off()
+            finally:
+                self.busy = False
         return None
 
     def write_serial(self, mssg):
 
         '''WRITES IN THE SERIAL BUFFER'''
-        if self.is_connected:
+        if self.is_connected and not self.busy:
+            self.robot.reset_output_buffer()
+            self.busy = True
             try:
                 self.robot.write(f'{mssg}\n'.encode())
                 self.robot.flush()
             except OSError:
                 self.robot_off()
+            finally:
+                self.busy = False
 
-    def communicate(self):
-        while self.is_connected:
+    def send_command(self, event):
+        step = 0.2
+        key = event.keysym.lower()
+        mssg = None
+        if key == 'w':
+            mssg = f'G0 X-{step}'
+        elif key == 's':
+            mssg = f'G0 X{step}'
+        elif key == 'a':
+            mssg = f'G0 Y-{step}'
+        elif key == 'd':
+            mssg = f'G0 Y{step}'
+        elif key == 'k':
+            mssg = f'G0 Z{step}'
+        elif key == 'j':
+            mssg = f'G0 Z-{step}'
+        elif key == 'h':
+            mssg = '$H'
+
+        if mssg:
+
+            self.write_serial(mssg)
+            self.read_serial()
             self.update_coordinates()
-            sleep(0.1)
-        print('Hilo terminado')
+
 
     def update_coordinates(self):
         self.write_serial('?')

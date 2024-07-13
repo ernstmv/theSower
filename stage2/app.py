@@ -19,7 +19,7 @@ class App(CTk):
         super().__init__()
 
         self.grid_rowconfigure((0), weight=0)
-        self.grid_rowconfigure((1, 2, 3, 4), weight=1)
+        self.grid_rowconfigure((1, 2, 3), weight=1)
         self.grid_columnconfigure((0, 1), weight=1)
 
         self.title('The Sower')
@@ -40,22 +40,24 @@ class App(CTk):
         self.video_frame.grid(
                 row=1, column=0,
                 padx=10, pady=10,
-                sticky='nsew')
-        self.controls_frame.grid(
+                sticky='nsew',
+                rowspan=2)
+        self.coordinates_frame.grid(
                 row=3, column=0,
                 padx=10, pady=10,
                 sticky='ew')
-        self.state_frame.grid(
-                row=4, column=0,
-                padx=10, pady=10,
-                sticky='ew')
+
         self.log_frame.grid(
                 row=0, column=1,
                 padx=10, pady=10,
-                sticky='nsew',
-                rowspan=4)
-        self.coordinates_frame.grid(
-                row=2, column=0,
+                sticky='ew',
+                rowspan=2)
+        self.controls_frame.grid(
+                row=2, column=1,
+                padx=10, pady=10,
+                sticky='ew')
+        self.state_frame.grid(
+                row=3, column=1,
                 padx=10, pady=10,
                 sticky='ew')
 
@@ -64,6 +66,7 @@ class App(CTk):
 
         self.camera = Camera(self)
         self.camera.autoconnect()
+
     # -------------------CAMERA-METHODS--------------------------
     def camera_on(self):
         self.state_frame.on_camera()

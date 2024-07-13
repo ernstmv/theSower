@@ -1,5 +1,5 @@
 from pyudev import Context
-from cv2 import VideoCapture
+from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, flip
 
 
 class Camera:
@@ -45,6 +45,10 @@ class Camera:
         '''CONNECTS CAMERA TO SELF.CAMERA_PORT AND CHECKS CONNECTION'''
 
         self.camera = VideoCapture(self.port)
+        width = 1280
+        height = 720
+        self.camera.set(CAP_PROP_FRAME_WIDTH, width)
+        self.camera.set(CAP_PROP_FRAME_HEIGHT, height)
         self.is_connected, _ = self.camera.read()
 
         if self.is_connected:
@@ -70,7 +74,7 @@ class Camera:
                 self.master.controls_frame.camera_to_play()
                 self.master.set_message('Cannot get image, camera error')
                 return None
-            return frame
+            return flip(frame, -1)
         self.master.set_message("Not camera connected")
         return None
 

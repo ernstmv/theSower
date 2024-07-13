@@ -21,7 +21,7 @@ class LogFrame(CTkFrame):
 
         self.log_textbox = CTkTextbox(
                 self, state='disabled',
-                width=500, height=900)
+                width=500, height=800)
         self.log_textbox.grid(
                 row=1, column=0,
                 padx=10, pady=5,

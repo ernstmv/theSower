@@ -9,8 +9,8 @@ class ControlsFrame(CTkFrame):
         super().__init__(master)
 
         self.grid_rowconfigure((0), weight=0)
-        self.grid_columnconfigure((0, 1, 2, 3), weight=1)
-        self.grid_columnconfigure((4), weight=0)
+        self.grid_columnconfigure((0, 1, 2), weight=1)
+        self.grid_columnconfigure((3), weight=0)
 
         self.camera_button = CTkButton(
                 self, text='Play video',
@@ -19,10 +19,6 @@ class ControlsFrame(CTkFrame):
         self.robot_button = CTkButton(
                 self, text='Connect robot',
                 command=self.connect_robot)
-
-        self.scan_button = CTkButton(
-                self, text='Scan for holes',
-                command=self.scan_for_holes)
 
         self.autoseed_button = CTkButton(
                 self, text='Autoseed',
@@ -41,16 +37,12 @@ class ControlsFrame(CTkFrame):
                 row=0, column=1,
                 padx=10, pady=10,
                 sticky='ew')
-        self.scan_button.grid(
+        self.autoseed_button.grid(
                 row=0, column=2,
                 padx=10, pady=10,
                 sticky='ew')
-        self.autoseed_button.grid(
-                row=0, column=3,
-                padx=10, pady=10,
-                sticky='ew')
         self.config_button.grid(
-                row=0, column=4,
+                row=0, column=3,
                 padx=10, pady=10)
 
     def play_video(self):
@@ -69,11 +61,8 @@ class ControlsFrame(CTkFrame):
         '''DISCONNECTS ROBOT AT MASTER'''
         self.master.disconnect_robot()
 
-    def scan_for_holes(self):
-        pass
-
     def autoseed(self):
-        pass
+        '''STARTS THE AUTOSEED SECUENCE'''
 
     def launch_config_window(self):
         '''LAUNCH CONFIG WINDOW AT MASTER'''
