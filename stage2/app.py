@@ -8,6 +8,7 @@ from camera import Camera
 from configWindow import ConfigWindow
 from robot import Robot
 from coordinatesFrame import CoordinatesFrame
+from auto import Autoset
 
 
 class App(CTk):
@@ -68,6 +69,7 @@ class App(CTk):
         self.camera.autoconnect()
 
     # -------------------CAMERA-METHODS--------------------------
+
     def camera_on(self):
         self.state_frame.on_camera()
 
@@ -87,8 +89,6 @@ class App(CTk):
         self.stop_video = True
 
     # ---------------------ROBOT-METHODS-------------------------
-
-
 
     def robot_on(self):
         self.state_frame.on_robot()
@@ -114,11 +114,6 @@ class App(CTk):
     def set_image(self, image):
         self.video_frame.set_image(image)
 
-    def launch_config_window(self):
-        self.controls_frame.camera_to_play()
-        self.config_window = ConfigWindow(self)
-        self.config_window.grab_set()
-
     def set_message(self, message):
         self.log_frame.set_message(message)
 
@@ -130,3 +125,15 @@ class App(CTk):
 
     def set_z_coord(self, z):
         self.coordinates_frame.set_z(z)
+
+    # --------------SPECIAL-METHODS----------------------------------
+
+    def launch_config_window(self):
+        self.controls_frame.camera_to_play()
+        self.config_window = ConfigWindow(self)
+        self.config_window.grab_set()
+
+    def autoseed(self):
+        '''STARTS AUTOSEED SECUENCE'''
+        self.auto = Autoset(self)
+        self.auto.auto()

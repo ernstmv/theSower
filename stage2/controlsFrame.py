@@ -63,6 +63,7 @@ class ControlsFrame(CTkFrame):
 
     def autoseed(self):
         '''STARTS THE AUTOSEED SECUENCE'''
+        self.master.autoseed()
 
     def launch_config_window(self):
         '''LAUNCH CONFIG WINDOW AT MASTER'''

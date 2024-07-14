@@ -5,10 +5,8 @@ from serial import Serial, SerialException
 
 class Robot:
 
-    '''
-    THIS CLASS MANAGES THE CARTESIAN ROBOT CAN DETECT PORTS, CREATE CONNECTIONS
-    READ AND WRITE SERIAL MESSAGES
-    '''
+    '''THIS CLASS MANAGES THE CARTESIAN ROBOT, IT CAN DETECT PORTS,
+    CREATE CONNECTIONS, AND READ AND WRITE SERIAL MESSAGES'''
 
     def __init__(self, master):
         self.master = master
@@ -21,33 +19,32 @@ class Robot:
 
     def get_ports(self):
         '''GET THE AVAILABLE SERIAL PORTS AND SAVES THEM IN A LIST'''
-        self.a_prts = [
-                p.device for p in s.comports() if 'tty' in p.description]
+        self.a_prts = [p.device for p in s.comports() if 'tty' in p.description]
 
     def set_port(self, port):
         '''SETS THE ROBOT PORT'''
         self.port = port
 
     def robot_on(self):
+        '''UPDATES INTERFACE TO ON AND ENABLES ROBOT RELATIVE MOVEMENT'''
         self.master.robot_on()
         self.unlock()
         self.standard()
         self.update_coordinates()
 
     def unlock(self):
-        self.write_serial('$X')
-        resp = self.read_serial()
-        while 'Unlocked' not in resp:
-            self.write_serial('$X')
-            resp = self.read_serial()
+        '''UNLOKS THE ROBOT AFTER A RESTART'''
+        self.void_write('$X')
         self.master.set_message('Robot unlocked')
 
     def standard(self):
+        '''SETS RELATIVE COORDINATES MODE'''
         self.write_serial('G91')
         if 'ok' in self.read_serial():
             self.master.set_message('Relative coordinates mode')
 
     def robot_off(self):
+        '''UPDATES INTERFACE TO OFF'''
         self.master.robot_off()
 
     def connect_robot(self):
@@ -78,14 +75,10 @@ class Robot:
         '''READS THE SERIAL BUFFER'''
 
         if self.is_connected and not self.busy:
-            self.robot.reset_input_buffer()
             self.busy = True
+            self.robot.reset_input_buffer()
             try:
-                resp = self.robot.readline().decode('utf-8').strip()
-                if resp is not None and 'Alarm' in resp:
-                    self.master.set_message("Alarm detected, robot blocked")
-                    self.robot_off()
-                return resp
+                return self.robot.readline().decode('utf-8').strip()
             except (SerialException, AttributeError):
                 self.robot_off()
             finally:
@@ -96,8 +89,8 @@ class Robot:
 
         '''WRITES IN THE SERIAL BUFFER'''
         if self.is_connected and not self.busy:
-            self.robot.reset_output_buffer()
             self.busy = True
+            self.robot.reset_output_buffer()
             try:
                 self.robot.write(f'{mssg}\n'.encode())
                 self.robot.flush()
@@ -106,37 +99,68 @@ class Robot:
             finally:
                 self.busy = False
 
+    def void_write(self, mssg):
+
+        '''WRITES IN THE SERIAL BUFFER AND TRASH RESPONSE'''
+        self.write_serial(mssg)
+        self.read_serial()
+
     def send_command(self, event):
+        '''THIS FUNCTION INTERPRETS THE KEYS AND SEND COMMANDS'''
+    
+        commands = {'w':'X-', 's':'X', 'a':'Y-', 'd':'Y', 'j':'Z-','k':'Z'}
         step = 0.2
         key = event.keysym.lower()
-        mssg = None
-        if key == 'w':
-            mssg = f'G0 X-{step}'
-        elif key == 's':
-            mssg = f'G0 X{step}'
-        elif key == 'a':
-            mssg = f'G0 Y-{step}'
-        elif key == 'd':
-            mssg = f'G0 Y{step}'
-        elif key == 'k':
-            mssg = f'G0 Z{step}'
-        elif key == 'j':
-            mssg = f'G0 Z-{step}'
-        elif key == 'h':
-            mssg = '$H'
-
-        if mssg:
-
-            self.write_serial(mssg)
-            self.read_serial()
+        if key == 'h':
+            self.go_home()
+            return
+        try:
+            self.void_write(f'G0 {commands[key]}{step}')
             self.update_coordinates()
-
+        except KeyError:
+            pass
+        return
 
     def update_coordinates(self):
+        '''THIS FUNCTION UPDATES THE ROBOT COORDINATES'''
         self.write_serial('?')
         resp = self.read_serial()
-        if resp is not None and 'MPos' in resp:
+        if resp and 'MPos' in resp:
             xax, yax, zax = resp.split('|')[1].split(':')[1].split(',')
             self.master.set_x_coord(xax)
             self.master.set_y_coord(yax)
             self.master.set_z_coord(zax)
+
+    def set_abs_mode(self):
+        self.void_write('G90')
+        self.void_write('G0 Z-50')
+
+    def go_to(self, pos):
+        self.write_serial(f'G0 X{pos[0]}')
+        self.write_serial(f'G0 Y{pos[1]}')
+        sleep(3)
+
+    def get_coordinates(self):
+        '''THIS FUNCTION UPDATES THE ROBOT COORDINATES'''
+        self.write_serial('?')
+        resp = self.read_serial()
+        if resp and 'MPos' in resp:
+            xax, yax, _ = resp.split('|')[1].split(':')[1].split(',')
+            return xax, yax
+
+    def go_home(self):
+        '''MOVES THE ROBOT TO THE HOME'''
+        self.write_serial('$H')
+        resp = ''
+        while 'ok' not in resp or resp is None:
+            resp = self.read_serial()
+        self.update_coordinates()
+        self.master.set_message('Robot on origin')
+
+    def get_into_position(self):
+        '''MOVES THE ROBOT DOWN, TO START RECOGNISING HOLES'''
+        self.void_write('G90')
+        self.void_write('G0 Z-18.2')
+        self.void_write('G0 Y-8.2')
+        self.master.set_message('Robot into start position')
+        self.void_write('G91')

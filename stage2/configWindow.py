@@ -72,7 +72,7 @@ class ConfigWindow(CTkToplevel):
 
     def get_camera_ports(self):
         self.master.camera.get_ports()
-        devices = self.master.camera.available_cameras
+        devices = self.master.camera.a_cam
         self.ports = [port for _, port in devices]
         self.devices = [device for device, _ in devices]
         self.camera_menu.configure(values=self.devices)

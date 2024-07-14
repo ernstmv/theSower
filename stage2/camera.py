@@ -1,5 +1,5 @@
 from pyudev import Context
-from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, flip
+from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, arrowedLine, circle
 
 
 class Camera:
@@ -8,7 +8,7 @@ class Camera:
     AND GET IMAGES'''
 
     def __init__(self, master):
-        self.available_cameras = []
+        self.a_cam = []
         self.port = None
         self.camera = None
         self.is_connected = False
@@ -20,24 +20,17 @@ class Camera:
         '''THIS METHOD SCAN FOR AVAILABLE CAMERA PORTS (USB PORTS)
         AND RETURNS A LIST OF TUPLES, (DEVICE NAME, PORT)'''
 
-        self.available_cameras = []
-        context = Context()
-        for device in context.list_devices(subsystem='video4linux'):
-            self.available_cameras.append((
-                device.get('ID_MODEL', 'Desconocido'),
-                device.device_node
-                ))
+        c = Context()
+        self.a_cam = [
+            (d.get('ID_MODEL' ,'Desconocido'), d.device_node)
+            for d in c.list_devices(subsystem='video4linux')]
 
     def set_port(self, port):
-
         '''SETS CAMERA PORT'''
-
         self.port = port
 
     def set_device(self, device):
-
         '''THIS METHOD SETS THE NAME OF THE CAMERA'''
-
         self.device = device
 
     def connect_camera(self):
@@ -45,10 +38,8 @@ class Camera:
         '''CONNECTS CAMERA TO SELF.CAMERA_PORT AND CHECKS CONNECTION'''
 
         self.camera = VideoCapture(self.port)
-        width = 1280
-        height = 720
-        self.camera.set(CAP_PROP_FRAME_WIDTH, width)
-        self.camera.set(CAP_PROP_FRAME_HEIGHT, height)
+        self.camera.set(CAP_PROP_FRAME_WIDTH, 1280)
+        self.camera.set(CAP_PROP_FRAME_HEIGHT, 720)
         self.is_connected, _ = self.camera.read()
 
         if self.is_connected:
@@ -73,10 +64,35 @@ class Camera:
                 self.master.camera_off()
                 self.master.controls_frame.camera_to_play()
                 self.master.set_message('Cannot get image, camera error')
-                return None
-            return flip(frame, -1)
+                return
+            height, width, _ = frame.shape
+
+            center_x, center_y = width // 2, height // 2
+
+            arrow_length = 50
+            arrowedLine(
+                frame,
+                (center_x - arrow_length, center_y), (center_x - 10, center_y),
+                (255, 0, 0), 1, tipLength=0.3)
+            arrowedLine(
+                frame,
+                (center_x + arrow_length, center_y), (center_x + 10, center_y),
+                (255, 0, 0), 1, tipLength=0.3)
+            arrowedLine(
+                frame,
+                (center_x, center_y - arrow_length), (center_x, center_y - 10),
+                (255, 0, 0), 1, tipLength=0.3)
+            arrowedLine(
+                frame,
+                (center_x, center_y + arrow_length), (center_x, center_y + 10),
+                (255, 0, 0), 1, tipLength=0.3)
+            circle(
+                frame,
+                (center_x, center_y),
+                1, (0, 0, 255), 1)
+            return frame
         self.master.set_message("Not camera connected")
-        return None
+        return
 
     def autoconnect(self):
 
@@ -84,13 +100,13 @@ class Camera:
         /DEV/VIDEO2 IF AVAILABLE, THE DEFAULT USB CAMERA'''
 
         self.get_ports()
-        for device, port in self.available_cameras:
+        for device, port in self.a_cam:
             if port in ('/dev/video3', '/dev/video2'):
                 self.set_port(port)
                 self.set_device(device)
                 self.connect_camera()
-                return None
+                return
             continue
 
         self.master.set_message('Not camera found, check connection manually')
-        return None
+        return 
