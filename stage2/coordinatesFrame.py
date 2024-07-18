@@ -49,19 +49,17 @@ class CoordinatesFrame(CTkFrame):
                 padx=10, pady=0,
                 sticky='ew')
 
-    def set_x(self, x):
+    def set_coords(self, x, y, z):
         self.x_entry.configure(state='normal')
         self.x_entry.delete(0, 'end')
         self.x_entry.insert(0, x)
         self.x_entry.configure(state='disabled')
 
-    def set_y(self, y):
         self.y_entry.configure(state='normal')
         self.y_entry.delete(0, 'end')
         self.y_entry.insert(0, y)
         self.y_entry.configure(state='disabled')
 
-    def set_z(self, z):
         self.z_entry.configure(state='normal')
         self.z_entry.delete(0, 'end')
         self.z_entry.insert(0, z)

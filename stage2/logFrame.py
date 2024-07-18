@@ -10,20 +10,14 @@ class LogFrame(CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.grid_rowconfigure((0, 1), weight=0)
+        self.grid_rowconfigure((0), weight=0)
         self.grid_columnconfigure((0), weight=1)
-
-        self.title_label = CTkLabel(self, text='Console')
-        self.title_label.grid(
-                row=0, column=0,
-                padx=10, pady=5,
-                sticky='ew')
 
         self.log_textbox = CTkTextbox(
                 self, state='disabled',
-                width=500, height=800)
+                width=500, height=250)
         self.log_textbox.grid(
-                row=1, column=0,
+                row=0, column=0,
                 padx=10, pady=5,
                 sticky='nsew')
 

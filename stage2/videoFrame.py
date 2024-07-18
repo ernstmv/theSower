@@ -1,5 +1,5 @@
 from customtkinter import CTkFrame, CTkLabel, CTkImage
-from cv2 import cvtColor, COLOR_BGR2RGB, imread, resize, INTER_AREA
+from cv2 import cvtColor, COLOR_BGR2RGB, imread, resize, INTER_AREA, arrowedLine, circle
 from PIL import Image
 
 
@@ -36,6 +36,40 @@ class VideoFrame(CTkFrame):
         RECIBES AN IMAGE, THEN CONVERTS TO CTK IMAGE AND FINALLY SHOWS
         IT IN CTKLABEL
         '''
+        height, width = image.shape[:2]
+        
+        # Calcular el centro de la imagen
+        center_x, center_y = width // 2, height // 2
+        
+        # Dibujar las flechas
+        gap = 10
+        thickness = 1
+        arrow_size = 50
+        # Flecha derecha
+        arrowedLine(
+            image, (center_x + gap, center_y), 
+            (center_x + gap + arrow_size, center_y),
+            (255, 0, 0), thickness, tipLength=1)
+        # Flecha izquierda
+        arrowedLine(
+            image, (center_x - gap, center_y),
+            (center_x - gap - arrow_size, center_y),
+            (255, 0, 0), thickness, tipLength=1)
+        # Flecha abajo
+        arrowedLine(
+            image, (center_x, center_y + gap),
+            (center_x, center_y + gap + arrow_size),
+            (255, 0, 0), thickness, tipLength=1)
+        # Flecha arriba
+        arrowedLine(
+            image, (center_x, center_y - gap),
+            (center_x, center_y - gap - arrow_size),
+            (255, 0, 0), thickness, tipLength=1)
+        
+        # Dibujar el círculo central
+        circle(
+            image, (center_x, center_y),
+            1, (0, 0, 255), thickness)
 
         image = self.convert_image(image)
         self.video_label.configure(text='', image=image)
