@@ -1,12 +1,14 @@
 from customtkinter import CTk
+from time import sleep
+from threading import Thread
 
-from videoFrame import VideoFrame
 from infoFrame import InfoFrame
+from videoFrame import VideoFrame
+from coordinatesFrame import CoordinatesFrame
+from graphFrame import GraphFrame
 from logFrame import LogFrame
 from controlsFrame import ControlsFrame
-from coordinatesFrame import CoordinatesFrame
 from stateFrame import StateFrame
-from graphFrame import GraphFrame
 
 from robot import Robot
 from camera import Camera
@@ -27,6 +29,7 @@ class App(CTk):
 
         self.title('The Sower')
         self.stop_video = False
+        self.stop_clock = False
         self.camera = None
         self.robot = None
 
@@ -157,8 +160,10 @@ class App(CTk):
     def autoseed(self):
         '''STARTS AUTOSEED SECUENCE'''
         self.busy()
-        self.auto = Autoset(self)
+        Thread(target=self.start_clock).start()
+        self.auto = Autoset(self, self.info_frame)
         self.auto.auto()
+        self.stop_clok()
         self.not_busy()
 
     def busy(self):
@@ -169,3 +174,19 @@ class App(CTk):
 
     def set_graph(self, graph):
         self.graph_frame.show_image(graph)
+
+    def start_clock(self):
+        seconds = 0 
+        minutes = 0
+        while not self.stop_clock:
+            self.info_frame.set_time(
+                f'{minutes}:{seconds}')
+            sleep(1)
+            seconds += 1
+            if seconds == 60:
+                minutes += 1
+                seconds = 0
+        self.stop_clock = False
+
+    def stop_clok(self):
+        self.stop_clock = True

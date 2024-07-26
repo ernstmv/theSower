@@ -30,7 +30,7 @@ class GraphFrame(CTkFrame):
 
     def convert_image(self, image):
         img = cvtColor(image, COLOR_BGR2RGB)
-        img_pil = Image.fromarray(image)
+        img_pil = Image.fromarray(img)
         img_ctk = CTkImage(
                 light_image=img_pil,
                 size=(int(img.shape[1]*1), int(img.shape[0]*1)))

@@ -22,6 +22,7 @@ class Robot:
         self.is_connected = False
         self.busy = False
         self.x_pos = 0
+        self.y_pos = 0
 
     # ----------------------------------PORTS--------------------------------
     def search_ports(self):
@@ -37,7 +38,6 @@ class Robot:
         '''UPDATES INTERFACE TO ON AND ENABLES ROBOT RELATIVE MOVEMENT'''
         self.is_connected = True
         self.unlock()
-        self.relative_mode()
         Thread(target=self.update_coordinates).start()
 
     def robot_off(self):
@@ -88,7 +88,7 @@ class Robot:
 
         '''READS THE SERIAL BUFFER'''
 
-        if self.is_connected and not self.busy:
+        if  not self.busy:
             self.busy = True
             try:
                 self.robot.reset_input_buffer()
@@ -109,7 +109,7 @@ class Robot:
                     self.robot.reset_output_buffer()
                     self.robot.write(f'{mssg}\n'.encode())
                     self.robot.flush()
-                except Exception as e:
+                except Exception:
                     self.robot_off()
                 finally:
                     self.busy = False
@@ -128,13 +128,14 @@ class Robot:
         self.write_serial(mssg)
         while True:
             resp = self.read_serial()
-            if resp and 'ok' in resp: break
+            if resp and 'ok' in resp: 
+                break
+            sleep(0.01)
 
     # ------------------MOVEMENT-METHODS----------------------
 
     def keys_manager(self, event):
         '''THIS FUNCTION INTERPRETS THE KEYS AND SEND COMMANDS'''
-        if not self.is_connected: return
     
         step = 0.2
         key = event.keysym.lower()
@@ -157,7 +158,6 @@ class Robot:
         if y: self.void_write(f'G0 Y{y}')
         if z: self.void_write(f'G0 Z{z}')
 
-
     def go_home(self):
         '''MOVES THE ROBOT TO THE HOME'''
         self.master.busy()
@@ -166,15 +166,11 @@ class Robot:
         self.master.set_message('Robot on origin')
         self.master.not_busy()
 
-    def recon_config(self):
-        '''TAKES ROBOT TO START POSITION'''
-        self.absolute_mode()
-        self.go_to(y='-8.2', z='-18.2')
-        self.void_write("$110=100")
-
     def pause(self, time):
         self.void_write(f'G4 P{time}')
 
+    def seed(self):
+        self.void_write('M15')
     # ---------------------------COORDINATES---------------------------
 
     def get_coordinates(self):
@@ -192,12 +188,14 @@ class Robot:
                 resp = self.get_coordinates() 
                 if resp:
                     xax, yax, zax = resp
-                    self.x_pos = float(xax)
+                    self.x_pos = round(float(xax), 1)
+                    self.y_pos = round(float(yax), 1)
+                    self.z_pos = round(float(zax), 1)
                     self.master.set_coords(xax, yax, zax)
             except Exception:
                 pass
             finally:
-                sleep(0.2)
+                sleep(0.1)
 
     def __del__(self):
         self.robot.close()
