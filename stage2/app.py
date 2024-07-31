@@ -154,8 +154,16 @@ class App(CTk):
     def set_coords(self, x, y, z):
         self.coordinates_frame.set_coords(x, y, z)
 
+    def set_graph(self, graph):
+        self.graph_frame.show_image(graph)
 
-    # --------------SPECIAL-METHODS----------------------------------
+    def busy(self):
+        self.state_frame.busy()
+
+    def not_busy(self):
+        self.state_frame.not_busy()
+
+    # --------------SEEDING-METHODS----------------------------------
 
     def autoseed(self):
         '''STARTS AUTOSEED SECUENCE'''
@@ -166,16 +174,8 @@ class App(CTk):
         self.stop_clok()
         self.not_busy()
 
-    def busy(self):
-        self.state_frame.busy()
-
-    def not_busy(self):
-        self.state_frame.not_busy()
-
-    def set_graph(self, graph):
-        self.graph_frame.show_image(graph)
-
     def start_clock(self):
+        self.stop_clock = False
         seconds = 0 
         minutes = 0
         while not self.stop_clock:
@@ -186,7 +186,6 @@ class App(CTk):
             if seconds == 60:
                 minutes += 1
                 seconds = 0
-        self.stop_clock = False
 
     def stop_clok(self):
         self.stop_clock = True

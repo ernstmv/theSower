@@ -2,7 +2,7 @@ from customtkinter import (
     CTkFrame, CTkLabel, CTkImage)
 from cv2 import (
         cvtColor, COLOR_BGR2RGB, imread, resize,
-        INTER_AREA)
+        INTER_AREA, circle)
 from PIL import Image
 
 
@@ -35,6 +35,13 @@ class VideoFrame(CTkFrame):
 
         ''' RECIBES AN IMAGE, THEN CONVERTS TO CTK IMAGE
         AND FINALLY SHOWS IT IN CTKLABEL '''
+        height, width = image.shape[:2]
+        
+        center_x, center_y = width // 2, height // 2
+
+        circle(
+            image, (center_x, center_y),
+            1, (0, 0, 255), 1)
 
         image = self.convert_image(image)
         self.video_label.configure(text='', image=image)
