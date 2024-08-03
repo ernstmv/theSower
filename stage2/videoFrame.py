@@ -14,18 +14,12 @@ class VideoFrame(CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.grid_rowconfigure((0, 1), weight=1)
+        self.grid_rowconfigure((0), weight=1)
         self.grid_columnconfigure((0), weight=1)
-
-        self.title_label = CTkLabel(self, text='Camera')
-        self.title_label.grid(
-                row=0, column=0,
-                padx=10, pady=5,
-                sticky='ew')
 
         self.video_label = CTkLabel(self, text=None)
         self.video_label.grid(
-                row=1, column=0,
+                row=0, column=0,
                 padx=10, pady=5,
                 sticky='nsew')
 
@@ -55,7 +49,7 @@ class VideoFrame(CTkFrame):
         img_pil = Image.fromarray(img)
         img_ctk = CTkImage(
                 light_image=img_pil,
-                size=(img.shape[1], img.shape[0]))
+                size=(1280, 720))
         return img_ctk
 
     def load_default_image(self):

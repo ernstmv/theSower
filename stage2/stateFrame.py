@@ -10,20 +10,9 @@ class StateFrame(CTkFrame):
         self.grid_columnconfigure((0, 1, 2), weight=1)
         self.grid_rowconfigure((0), weight=1)
 
-        self.is_camera = CTkButton(
-                self,
-                fg_color='#011F26',
-                border_width=1,
-                command=None)
-        self.is_robot = CTkButton(
-                self,
-                fg_color='#011F26',
-                border_width=1,
-                command=None)
-        self.is_busy = CTkButton(
-                self,
-                fg_color='#011F26',
-                border_width=1)
+        self.is_camera = CTkButton(self)
+        self.is_robot = CTkButton(self)
+        self.is_busy = CTkButton(self, state='disabled')
 
         self.is_camera.grid(
                 row=0, column=0,
@@ -45,38 +34,36 @@ class StateFrame(CTkFrame):
     def on_camera(self):
         self.is_camera.configure(
                 text='Camera online',
-                border_color='#228B22',
                 text_color='#228B22',
+                hover_color='#4E780E',
                 command=self.disconnect_camera)
     def on_robot(self):
         self.is_robot.configure(
                 text='Robot online',
-                border_color='#228B22',
                 text_color='#228B22',
+                hover_color='#4E780E',
                 command=self.disconnect_robot)
     def busy(self):
         self.is_busy.configure(
                 text='Busy',
-                border_color='#F2AB27',
-                text_color='#F2AB27')
+                border_color='#F2AB27')
 
     def off_camera(self):
         self.is_camera.configure(
                 text='Camera offline',
-                border_color='#730220',
-                text_color='#730220',
+                fg_color='#D90D1E',
+                hover_color='#40010D',
                 command=self.connect_camera)
     def off_robot(self):
         self.is_robot.configure(
                 text='Robot offline',
-                border_color='#730220',
-                text_color='#730220',
+                fg_color='#D90D1E',
+                hover_color='#40010D',
                 command=self.connect_robot)
     def not_busy(self):
         self.is_busy.configure(
                 text='Available',
-                border_color='#333333',
-                text_color='#333333')
+                fg_color='#228B22')
 
     def disconnect_camera(self):
         self.master.disconnect_camera()

@@ -5,12 +5,15 @@ from cv2 import (
             cvtColor, COLOR_RGB2HSV, COLOR_RGB2BGR,
             addWeighted, inRange, GaussianBlur,
             findContours, RETR_EXTERNAL, CHAIN_APPROX_NONE,
-            contourArea, boundingRect, rectangle)  
+            contourArea, boundingRect, rectangle
+            )  
 
+from numpy import (
+            array, zeros_like, zeros, frombuffer, 
+            uint8, sqrt, linalg
+            )
 
 from threading import Thread
-from numpy import array, zeros_like, zeros, frombuffer, uint8, sqrt, linalg
-from math import dist
 from time import sleep
 
 
@@ -19,6 +22,7 @@ class Autoset:
     '''CLASS FOR MANAGING THE SEED TASK'''
 
     def __init__(self, master, info):
+
         self.master = master
         self.img = None
         self.mask = None
@@ -31,8 +35,8 @@ class Autoset:
         self.info_f = info
 
     def auto(self):
-
         '''AUTOSEED SEQUENCE'''
+
         if self.check_devices():
             self.is_working = True
             Thread(target=self.start_sequence).start()
@@ -41,54 +45,82 @@ class Autoset:
                 self.detect_holes()
                 self.put_image()
                 self.master.update()
-
-    def check_devices(self):
-        '''THIS METHODS RESET CONNECTIONS'''
-        self.master.disconnect_camera()
-        self.master.disconnect_robot()
-        sleep(1)
-        self.master.connect_camera()
-        self.master.connect_robot()
-        self.rbt = self.master.robot
-        self.cam = self.master.camera
-        return self.cam.is_connected & self.rbt.is_connected
+        else:
+            self.master.set_message(
+                "Can't start, check devices")
 
     def start_sequence(self):
+        '''THIS IS THE FULL SEEDING SEQUENCE'''
 
-        '''THIS METHOD MOVES THE ROBOT AND TAKES
-        PHOTOS IN EACH POSITION'''
+        self.prepare()
+        print('prepare done')
+        self.recognize()
+        print('recognizee done')
+        self.seed()
+        print('seed done')
+        self.reset()
+        print('reset done')
 
-        locs = [('-0.20', '-3.20'), ('-6.60', '-3.20'),
-                ('-12.8', '-3.20'), ('-19.2', '-3.20'),
-                ('-24.0', '-3.20'), ('-24.0', '-15.0'),
-                ('-19.2', '-15.0'), ('-12.8', '-15.0'),
-                ('-6.60', '-15.0'), ('-0.20', '-15.0')]
+    def prepare(self):
+        '''IT TAKES THE ROBOT TO THE STARTING POSITION'''
 
         self.rbt.go_home()
         self.rbt.absolute_mode()
+
+    def recognize(self):
+        '''THIS METHOD MOVES THE ROBOT AND TAKES PHOTOS
+        IN EACH POSITION'''
+
+        locs = [('-0.20', '-3.20'), ('-6.60', '-3.20'),
+                ('-12.8', '-3.20'), ('-19.2', '-3.20'),
+                ('-24.0', '-3.20'), ('-24.0', '-11.8'),
+                ('-19.2', '-11.8'), ('-12.8', '-11.8'),
+                ('-6.60', '-11.8'), ('-0.20', '-11.8')]
+
         self.rbt.go_to(z='-26.0')
 
         for i, loc in enumerate(locs):
 
             self.master.set_message(f"Moving to region {i+1}")
+
             self.rbt.go_to(x=loc[0], y=loc[1])
-
-            while True:
-                if float(loc[1]) == self.rbt.y_pos:
-                    if float(loc[0]) == self.rbt.x_pos:
-                        break
-                sleep(0.1)
-
+            self.rbt.wait_to(x=float(loc[0]), y=float(loc[1]))
             self.rbt.pause(1)
+
             holes = self.detect_holes()
             self.get_coordinates(holes, i)
             self.info_f.set_viable(len(self.total))
             sleep(1)
 
-        self.seed()
+    def seed(self):
+        '''THIS METHOD IS ON CHARGE OF SOWING THE
+        IDENTIFIED HOLES'''
+
+        self.to_seed = self.total.copy()
+        self.rows_and_cols_sort()
+        self.show_graph()
+        total = len(self.total)
+
+        for i in range(len(self.to_seed)):
+
+            pos = self.to_seed.pop()
+            self.put_seed(pos)
+            self.sown.append(pos)
+
+            self.info_f.set_sown(i+1)
+            self.info_f.set_progress(f"{i+1 * 100// total}%")
+            self.show_graph()
+
+            sleep(5)
+
+    def reset(self):
+        '''THIS TAKES THE ROBOT TO THE STARTING
+        POSTION AFTER SEEDING'''
 
         self.rbt.go_home()
         self.is_working = False
+
+# ------------------------------AUXILIAR-METHODS---------------
 
     def show_graph(self):
         '''SHOWS A SCATTER FROM PYPLOT TO SHOW THE
@@ -123,6 +155,7 @@ class Autoset:
 
     def get_image(self):
         '''SETTER FOR SELF.IMG, ALSO CREATES SELF.MASK'''
+
         self.img = self.cam.get_image()
         self.mask = zeros_like(self.img)
 
@@ -132,9 +165,19 @@ class Autoset:
         img = addWeighted(self.img, 0.6, self.mask, 0.8, 0)
         self.master.set_image(img)
 
+    def check_devices(self):
+        '''THIS METHODS RESET CONNECTIONS'''
+
+        self.master.disconnect_camera()
+        self.master.disconnect_robot()
+        sleep(1)
+        self.master.connect_camera()
+        self.master.connect_robot()
+        self.rbt = self.master.robot
+        self.cam = self.master.camera
+        return self.cam.is_connected & self.rbt.is_connected
 
     def get_coordinates(self, holes, loc):
-
         '''USING THE HOLES PARAMETER IDENTIFIES
         THE COORDINATES (X, Y) OF EACH HOLE'''
 
@@ -232,101 +275,40 @@ class Autoset:
 
         return holes
 
-
-    def seed(self):
-
-        self.to_seed = self.total.copy()
-        self.rows_and_matrix_sort()
-        self.show_graph()
-
-        for i in range(len(self.to_seed)):
-
-            pos = self.to_seed.pop()
-            pos = (round(pos[0], 1), round(pos[1], 1))
-            self.rbt.go_to(x=pos[0], y=pos[1])
-            self.put_seed(pos)
-            self.sown.append(pos)
-
-            self.info_f.set_sown(len(self.sown))
-
-            progress = len(self.sown) * 100/ len(self.total)
-
-            self.info_f.set_progress(f"{int(progress)}%")
-            self.show_graph()
-
-            sleep(5)
-
     def put_seed(self, pos):
-        self.rbt.go_to(z=-53)
-        while True:
-            if self.rbt.z_pos == -53:
-                if self.rbt.x_pos == pos[0]:
-                    if self.rbt.y_pos == pos[1]:
-                        break
-            sleep(0.1)
+
+        pos = (round(pos[0], 1), round(pos[1], 1))
+        self.rbt.go_to(x=pos[0], y=pos[1], z=-53)
+        self.rbt.wait_to(x=pos[0], y=pos[1], z=-53)
 
         self.rbt.seed()
         self.rbt.go_to(z=-50)
+    
+    # -----------------ROUTE-COMPUTING-METHODS-----------------
 
-
-    def nearest_neighbor_tsp(self):
-
-        n = len(self.to_seed)
-        unvisited = list(range(1, n))
-        route = [0]
-        
-        while unvisited:
-            last = route[-1]
-            next_point = min(
-                unvisited,
-                key=lambda x: linalg.norm(array(self.to_seed[x]) - array(self.to_seed[last]))
-            )
-
-            route.append(next_point)
-            unvisited.remove(next_point)
-
-        to_seed = [self.to_seed[i] for i in route]
-        self.to_seed = to_seed
-
-    def approx_tsp(self):
-
-
-        n = len(self.to_seed)
-        distance_matrix = zeros((n, n))
-        for i in range(n):
-            for j in range(i+1, n):
-                dist = linalg.norm(array(self.to_seed[i]) - array(self.to_seed[j]))
-                distance_matrix[i][j] = distance_matrix[j][i] = dist
-
-        permutation, distance = solve_tsp(distance_matrix)
-
-        to_seed = [self.to_seed[i] for i in permutation]
-        self.to_seed = to_seed
-
-    def rows_and_matrix_sort(self):
+    def rows_and_cols_sort(self):
+        '''THIS FUNCTION SORTS THE IDENTIFIED HOLES
+        IN ROWS, AND APPEND THEM INTO A LIST'''
 
         centers = sorted(self.to_seed)
         to_seed = []
         row = []
         row_head = 0
         case = 0
+        size = len(centers)
 
-        for i, p in enumerate(centers):
+        for i in range(size):
 
-            if i == len(centers)-1:
+            if i == size - 1:
                 row.append((centers[row_head][0], centers[i][1]))
                 if case % 2 == 0:
-                    if row is not None:
-                        row = sorted(row)
-                        to_seed += [row[-1 - i] for i in range(len(row))]
+                    row = sorted(row)
+                    to_seed += [row[-1 - i] for i in range(len(row))]
                 else:
-                    if row is not None:
-                        to_seed += sorted(row)
+                    to_seed += sorted(row)
                 continue
 
-            dista = abs(centers[i+1][0] - centers[i][0])
-
-            if dista < 1:
+            if abs(centers[i+1][0] - centers[i][0]) < 1:
                 row.append((centers[row_head][0], centers[i][1]))
             else:
                 row.append((centers[row_head][0], centers[i][1]))

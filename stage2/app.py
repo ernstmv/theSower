@@ -9,6 +9,7 @@ from graphFrame import GraphFrame
 from logFrame import LogFrame
 from controlsFrame import ControlsFrame
 from stateFrame import StateFrame
+from extraFrame import ExtraFrame
 
 from robot import Robot
 from camera import Camera
@@ -23,8 +24,8 @@ class App(CTk):
     def __init__(self):
         super().__init__()
 
-        self.grid_rowconfigure((0), weight=0)
-        self.grid_rowconfigure((1, 2, 3, 4), weight=1)
+        self.grid_rowconfigure((0, 1), weight=0)
+        self.grid_rowconfigure((2, 3, 4, 5), weight=1)
         self.grid_columnconfigure((0, 1), weight=1)
 
         self.title('The Sower')
@@ -40,36 +41,43 @@ class App(CTk):
         self.log_frame = LogFrame(self)
         self.coordinates_frame = CoordinatesFrame(self)
         self.graph_frame = GraphFrame(self)
+        self.extra_frame = ExtraFrame(self)
 
-        self.info_frame.grid(
+        self.extra_frame.grid(
                 row=0, column=0,
                 padx=10, pady=10,
-                sticky='nsew')
-        self.video_frame.grid(
-                row=1, column=0,
-                padx=10, pady=10,
-                sticky='nsew',
-                rowspan=3)
-        self.coordinates_frame.grid(
-                row=4, column=0,
-                padx=10, pady=10,
                 sticky='ew')
-
         self.graph_frame.grid(
-                row=0, column=1,
+                row=1, column=0,
                 padx=10, pady=10,
                 sticky='ew',
                 rowspan=2)
         self.log_frame.grid(
-                row=2, column=1,
+                row=3, column=0,
                 padx=10, pady=10,
+                rowspan=2,
                 sticky='ew')
         self.controls_frame.grid(
-                row=3, column=1,
+                row=5, column=0,
+                padx=10, pady=10,
+                sticky='ew')
+
+        self.info_frame.grid(
+                row=0, column=1,
+                padx=10, pady=10,
+                rowspan=2,
+                sticky='nsew')
+        self.video_frame.grid(
+                row=2, column=1,
+                padx=10, pady=10,
+                sticky='nsew',
+                rowspan=2)
+        self.coordinates_frame.grid(
+                row=4, column=1,
                 padx=10, pady=10,
                 sticky='ew')
         self.state_frame.grid(
-                row=4, column=1,
+                row=5, column=1,
                 padx=10, pady=10,
                 sticky='ew')
 
@@ -131,7 +139,7 @@ class App(CTk):
             self.robot = None
 
     def disconnect_robot(self):
-        self.unbind("<KeyPress")
+        self.unbind("<KeyPress>")
         del self.robot
         self.robot = None
         self.robot_off()
@@ -169,8 +177,10 @@ class App(CTk):
         '''STARTS AUTOSEED SECUENCE'''
         self.busy()
         Thread(target=self.start_clock).start()
+
         self.auto = Autoset(self, self.info_frame)
         self.auto.auto()
+
         self.stop_clok()
         self.not_busy()
 

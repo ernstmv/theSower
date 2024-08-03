@@ -6,15 +6,8 @@ class InfoFrame(CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.grid_rowconfigure((0, 1, 2), weight=0)
+        self.grid_rowconfigure((0, 1), weight=0)
         self.grid_columnconfigure((0, 1, 2, 3), weight=1)
-
-        self.title_label = CTkLabel(self, text='Process information')
-        self.title_label.grid(
-                row=0, column=0,
-                columnspan=4,
-                sticky='ew',
-                padx=10, pady=5)
 
         self.holes_label = CTkLabel(self, text='Viable holes:')
         self.seeded_label = CTkLabel(self, text='Sown holes:')
@@ -22,19 +15,19 @@ class InfoFrame(CTkFrame):
         self.time_label = CTkLabel(self, text='Time transcurred:')
 
         self.holes_label.grid(
-                row=1, column=0,
+                row=0, column=0,
                 padx=5, pady=0,
                 sticky='ew')
         self.seeded_label.grid(
-                row=1, column=1,
+                row=0, column=1,
                 padx=5, pady=0,
                 sticky='ew')
         self.progress_label.grid(
-                row=1, column=2,
+                row=0, column=2,
                 padx=5, pady=0,
                 sticky='ew')
         self.time_label.grid(
-                row=1, column=3,
+                row=0, column=3,
                 padx=5, pady=0,
                 sticky='ew')
 
@@ -44,19 +37,19 @@ class InfoFrame(CTkFrame):
         self.time_entry = CTkEntry(self, state='disabled')
 
         self.holes_entry.grid(
-                row=2, column=0,
+                row=1, column=0,
                 padx=5, pady=10,
                 sticky='ew')
         self.seeded_entry.grid(
-                row=2, column=1,
+                row=1, column=1,
                 padx=5, pady=10,
                 sticky='ew')
         self.progress_entry.grid(
-                row=2, column=2,
+                row=1, column=2,
                 padx=5, pady=10,
                 sticky='ew')
         self.time_entry.grid(
-                row=2, column=3,
+                row=1, column=3,
                 padx=5, pady=10,
                 sticky='ew')
 

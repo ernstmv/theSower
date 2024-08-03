@@ -10,16 +10,20 @@ class ControlsFrame(CTkFrame):
 
         self.grid_rowconfigure((0), weight=0)
         self.grid_columnconfigure((0, 1), weight=1)
-        self.grid_columnconfigure((2), weight=0)
 
         self.camera_button = CTkButton(
                 self, text='Play video',
+                border_color="#0DF205",
+                fg_color="#0DF205",
+                hover_color='#09A603',
                 command=self.play_video)
+
         self.autoseed_button = CTkButton(
                 self, text='Autoseed',
+                border_color="#0DF205",
+                fg_color="#0DF205",
+                hover_color='#09A603',
                 command=self.autoseed)
-        self.config_button = CTkButton(
-                self, text=' ')
 
         self.camera_button.grid(
                 row=0, column=0,
@@ -29,9 +33,6 @@ class ControlsFrame(CTkFrame):
                 row=0, column=1,
                 padx=10, pady=10,
                 sticky='ew')
-        self.config_button.grid(
-                row=0, column=2,
-                padx=10, pady=10)
 
     def play_video(self):
         '''GET VIDEO FOR CAMERA'''
@@ -44,10 +45,6 @@ class ControlsFrame(CTkFrame):
     def autoseed(self):
         '''STARTS THE AUTOSEED SECUENCE'''
         self.master.autoseed()
-
-    def launch_config_window(self):
-        '''LAUNCH CONFIG WINDOW AT MASTER'''
-        self.master.launch_config_window()
 
     # --------------------------BOTTON-CONFIGURE-----------------------
 
