@@ -49,7 +49,7 @@ class VideoFrame(CTkFrame):
         img_pil = Image.fromarray(img)
         img_ctk = CTkImage(
                 light_image=img_pil,
-                size=(1280, 720))
+                size=(img.shape[1], img.shape[0]))
         return img_ctk
 
     def load_default_image(self):
@@ -60,6 +60,6 @@ class VideoFrame(CTkFrame):
         scale = 0.8
         img = imread('/home/ernstmv/theSower/stage2/.theme/default.jpg')
         height, width = img.shape[:2]
-        new_size = (int(width*scale), int(height*scale))
+        new_size = (1280, 720)
         img = resize(img, new_size, interpolation=INTER_AREA)
         self.set_image(img)

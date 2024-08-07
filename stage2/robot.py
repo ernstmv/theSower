@@ -212,7 +212,8 @@ class Robot:
         self.write_serial('?')
         resp = self.read_serial()
         if resp and 'MPos' in resp:
-            return resp.split('|')[1].split(':')[1].split(',')
+            coord = resp.split(':')[1].split(',')
+            return coord[0], coord[1], coord[2]
 
     def update_coordinates(self):
         '''THIS FUNCTION UPDATES DE GUI WITH THE NEW ROBOT COORDINATES'''

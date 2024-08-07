@@ -34,14 +34,12 @@ class StateFrame(CTkFrame):
     def on_camera(self):
         self.is_camera.configure(
                 text='Camera online',
-                text_color='#228B22',
-                hover_color='#4E780E',
+                fg_color='#4E780E',
                 command=self.disconnect_camera)
     def on_robot(self):
         self.is_robot.configure(
                 text='Robot online',
-                text_color='#228B22',
-                hover_color='#4E780E',
+                fg_color='#4E780E',
                 command=self.disconnect_robot)
     def busy(self):
         self.is_busy.configure(
