@@ -8,14 +8,14 @@ class LogFrame(CTkFrame):
     '''
 
     def __init__(self, master):
-        super().__init__(master, fg_color='#39435E')
+        super().__init__(master)
 
         self.grid_rowconfigure((0), weight=1)
         self.grid_columnconfigure((0), weight=1)
 
         self.log_textbox = CTkTextbox(
                 self, state='disabled',
-                width=300, height=400,
+                width=300, height=200,
                 font=("ProFontWindowsNerdFont", 20))
         self.log_textbox.grid(
                 row=0, column=0,

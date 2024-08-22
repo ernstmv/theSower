@@ -31,7 +31,7 @@ class Camera:
 
         c = Context()
         return [
-            (d.get('ID_MODEL' ,'Desconocido'), d.device_node)
+            (d.get('ID_MODEL', 'Desconocido'), d.device_node)
             for d in c.list_devices(subsystem='video4linux')]
 
     def autoconnect(self):
@@ -75,7 +75,5 @@ class Camera:
         return frame if self.is_connected else None
 
     def __del__(self):
-        try:
+        if self.camera is not None:
             self.camera.release()
-        except AttributeError:
-            pass

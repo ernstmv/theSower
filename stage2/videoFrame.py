@@ -58,7 +58,7 @@ class VideoFrame(CTkFrame):
         CONNECTED '''
 
         scale = 0.8
-        img = imread('/home/ernstmv/theSower/stage2/.theme/default.jpg')
+        img = imread('/home/user/autonomous_sowing_system/theSower/stage2/.theme/default.jpg')
         height, width = img.shape[:2]
         new_size = (1280, 720)
         img = resize(img, new_size, interpolation=INTER_AREA)

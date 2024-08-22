@@ -1,15 +1,14 @@
-from customtkinter import CTk
+from customtkinter import CTk, CTkSegmentedButton, CTkLabel
 from time import sleep
 from threading import Thread
 
-from infoFrame import InfoFrame
+from headerFrame import HeaderFrame
+from visualizeFrame import VisualizeFrame
+from configFrame import ConfigFrame
+from dataFrame import DataFrame
 from videoFrame import VideoFrame
-from coordinatesFrame import CoordinatesFrame
-from graphFrame import GraphFrame
+from buttonsFrame import ButtonsFrame
 from logFrame import LogFrame
-from controlsFrame import ControlsFrame
-from stateFrame import StateFrame
-from extraFrame import ExtraFrame
 
 from robot import Robot
 from camera import Camera
@@ -24,9 +23,11 @@ class App(CTk):
     def __init__(self):
         super().__init__()
 
-        self.grid_rowconfigure((0, 1), weight=0)
-        self.grid_rowconfigure((2, 3, 4, 5), weight=1)
-        self.grid_columnconfigure((0, 1), weight=1)
+        self.grid_rowconfigure((0, 1, 2), weight=1)
+        self.grid_columnconfigure((0, 1, 2), weight=1)
+
+        self.frames_icons = [' ', ' ', ' ']
+        mssg = 'Universidad Autonoma Chapingo\nCIIARAA DIMA\n2024'
 
         self.title('The Sower')
         self.stop_video = False
@@ -34,57 +35,78 @@ class App(CTk):
         self.camera = None
         self.robot = None
 
-        self.info_frame = InfoFrame(self)
-        self.video_frame = VideoFrame(self)
-        self.controls_frame = ControlsFrame(self)
-        self.state_frame = StateFrame(self)
-        self.log_frame = LogFrame(self)
-        self.coordinates_frame = CoordinatesFrame(self)
-        self.graph_frame = GraphFrame(self)
-        self.extra_frame = ExtraFrame(self)
+        self.z_scan = None
+        self.planting_depth = None
+        self.z_tray = None
 
-        self.extra_frame.grid(
+        self.header_frame = HeaderFrame(self)
+        self.vis_frame = VisualizeFrame(self)
+        self.conf_frame = ConfigFrame(self)
+        self.data_frame = DataFrame(self)
+        self.video_frame = VideoFrame(self)
+        self.buttons_frame = ButtonsFrame(self)
+        self.log_frame = LogFrame(self)
+
+        self.switch_button = CTkSegmentedButton(
+                self, values=self.frames_icons,
+                command=self.switch_frame)
+
+        self.switch_button.grid(
                 row=0, column=0,
                 padx=10, pady=10,
                 sticky='ew')
-        self.graph_frame.grid(
-                row=1, column=0,
-                padx=10, pady=10,
-                sticky='ew',
-                rowspan=2)
-        self.log_frame.grid(
-                row=3, column=0,
-                padx=10, pady=10,
-                rowspan=2,
-                sticky='ew')
-        self.controls_frame.grid(
-                row=5, column=0,
-                padx=10, pady=10,
-                sticky='ew')
 
-        self.info_frame.grid(
+        self.data_frame.grid(
+                row=1, column=0,
+                rowspan=4,
+                padx=10, pady=10,
+                sticky='nsew')
+
+        self.conf_frame.grid(
+                row=1, column=0,
+                rowspan=4,
+                padx=10, pady=10,
+                sticky='nsew')
+
+        self.vis_frame.grid(
+                row=1, column=0,
+                rowspan=4,
+                padx=10, pady=10,
+                sticky='nsew')
+
+        self.header_frame.grid(
                 row=0, column=1,
                 padx=10, pady=10,
-                rowspan=2,
-                sticky='nsew')
+                columnspan=2,
+                sticky='ew')
         self.video_frame.grid(
+                row=1, column=1,
+                columnspan=2,
+                padx=10, pady=10,
+                sticky='nsew')
+        self.buttons_frame.grid(
                 row=2, column=1,
                 padx=10, pady=10,
-                sticky='nsew',
-                rowspan=2)
-        self.coordinates_frame.grid(
-                row=4, column=1,
-                padx=10, pady=10,
                 sticky='ew')
-        self.state_frame.grid(
-                row=5, column=1,
+        self.log_frame.grid(
+                row=2, column=2,
+                rowspan=2,
                 padx=10, pady=10,
-                sticky='ew')
+                sticky='nsew')
+
+        self.registered_label = CTkLabel(self, text=mssg)
+        self.registered_label.grid(
+                row=3, column=1,
+                padx=10, pady=10,
+                sticky='nsew')
+
+        self.vis_frame.tkraise()
 
     # -------------------CAMERA-METHODS--------------------------
 
-
     def connect_camera(self):
+        '''HERE WE CREATE A NEW CAMERA OBJECT AND TRY TO CONNECT IT, IF IT
+        THEN UPDATES UI, ELSE DELETE AND DO NOTHING'''
         self.camera = Camera(self)
         self.camera.autoconnect()
         if self.camera.is_connected:
@@ -93,22 +115,23 @@ class App(CTk):
             del self.camera
             self.camera = None
 
+    def camera_on(self):
+        self.buttons_frame.camera_on()
+        self.buttons_frame.to_play()
+
     def disconnect_camera(self):
         del self.camera
         self.camera = None
         self.camera_off()
 
-    def camera_on(self):
-        self.state_frame.on_camera()
-
     def camera_off(self):
-        self.state_frame.off_camera()
-        self.controls_frame.camera_to_play()
+        self.buttons_frame.camera_off()
+        self.buttons_frame.disable_camera()
         self.set_message("Camera disconnected")
 
     def play_video(self):
         if self.camera:
-            self.controls_frame.camera_to_pause()
+            self.buttons_frame.to_pause()
             self.stop_video = False
             while not self.stop_video:
                 img = self.camera.get_image()
@@ -119,12 +142,10 @@ class App(CTk):
                 self.set_image(img)
                 self.update()
         else:
-            self.set_message("No camera connected")
+            self.set_message("Error in camera")
 
     def pause_video(self):
         self.stop_video = True
-        self.controls_frame.camera_to_play()
-
 
     # ---------------------ROBOT-METHODS-------------------------
 
@@ -140,15 +161,15 @@ class App(CTk):
 
     def disconnect_robot(self):
         self.unbind("<KeyPress>")
-        del self.robot
+        self.robot.close()
         self.robot = None
         self.robot_off()
 
     def robot_on(self):
-        self.state_frame.on_robot()
+        self.buttons_frame.robot_on()
 
     def robot_off(self):
-        self.state_frame.off_robot()
+        self.buttons_frame.robot_off()
         self.set_message('Robot disconnected')
 
     # --------------FRAME-METHODS----------------------------------
@@ -160,16 +181,13 @@ class App(CTk):
         self.log_frame.set_message(message)
 
     def set_coords(self, x, y, z):
-        self.coordinates_frame.set_coords(x, y, z)
-
-    def set_graph(self, graph):
-        self.graph_frame.show_image(graph)
+        self.header_frame.set_coords(x, y, z)
 
     def busy(self):
-        self.state_frame.busy()
+        self.buttons_frame.busy()
 
     def not_busy(self):
-        self.state_frame.not_busy()
+        self.buttons_frame.not_busy()
 
     # --------------SEEDING-METHODS----------------------------------
 
@@ -178,15 +196,17 @@ class App(CTk):
         self.busy()
         Thread(target=self.start_clock).start()
 
-        self.auto = Autoset(self, self.info_frame)
+        self.auto = Autoset(
+                self, self.visualize_frame,
+                self.z_scan, self.plating_depth, self.z_tray)
         self.auto.auto()
 
-        self.stop_clok()
+        self.stop_clock()
         self.not_busy()
 
     def start_clock(self):
         self.stop_clock = False
-        seconds = 0 
+        seconds = 0
         minutes = 0
         while not self.stop_clock:
             self.info_frame.set_time(
@@ -197,5 +217,14 @@ class App(CTk):
                 minutes += 1
                 seconds = 0
 
-    def stop_clok(self):
+    def stop_clock(self):
         self.stop_clock = True
+
+    def switch_frame(self, choice):
+        idx = self.frames_icons.index(choice)
+        if idx == 0:
+            self.vis_frame.tkraise()
+        elif idx == 1:
+            self.conf_frame.tkraise()
+        elif idx == 2:
+            self.data_frame.tkraise()

@@ -17,12 +17,14 @@ class Robot:
         self.master = master
 
         self.port = None
-        self.robot = None
+        self.arduino = None
         self.absolute = False
         self.is_connected = False
         self.busy = False
+
         self.x_pos = 0
         self.y_pos = 0
+        self.z_pos = 0
 
     # ----------------------------------PORTS------------------
     def search_ports(self):
@@ -42,6 +44,7 @@ class Robot:
         ROBOT RELATIVE MOVEMENT'''
 
         self.is_connected = True
+        self.master.set_message("Robot connected")
         self.unlock()
         Thread(target=self.update_coordinates).start()
 
@@ -77,7 +80,7 @@ class Robot:
         '''TRY TO CONNECT, IF THEN UPDATES UI, ELSE THROWS ERROR'''
 
         try:
-            self.robot = Serial(self.port, 115200, timeout=0.1)
+            self.arduino = Serial(self.port, 115200, timeout=0.1)
             sleep(2)
             self.robot_on()
         except (SerialException, AttributeError):
@@ -97,12 +100,12 @@ class Robot:
     def read_serial(self):
         '''READS THE SERIAL BUFFER'''
 
-        if  not self.busy:
+        if not self.busy:
             self.busy = True
             try:
-                self.robot.reset_input_buffer()
-                return self.robot.readline().decode('utf-8').strip()
-            except Exception as e:
+                self.arduino.reset_input_buffer()
+                return self.arduino.readline().decode('utf-8').strip()
+            except Exception:
                 self.robot_off()
                 self.master.set_message('Connection lost...')
             finally:
@@ -112,12 +115,12 @@ class Robot:
         '''WRITES IN THE SERIAL BUFFER'''
 
         while True:
-            if  not self.busy:
+            if not self.busy:
                 self.busy = True
                 try:
-                    self.robot.reset_output_buffer()
-                    self.robot.write(f'{mssg}\n'.encode())
-                    self.robot.flush()
+                    self.arduino.reset_output_buffer()
+                    self.arduino.write(f'{mssg}\n'.encode())
+                    self.arduino.flush()
                 except Exception:
                     self.robot_off()
                 finally:
@@ -139,7 +142,7 @@ class Robot:
         self.write_serial(mssg)
         while True:
             resp = self.read_serial()
-            if resp and 'ok' in resp: 
+            if resp and 'ok' in resp:
                 break
             sleep(0.01)
 
@@ -147,11 +150,13 @@ class Robot:
 
     def keys_manager(self, event):
         '''THIS FUNCTION INTERPRETS THE KEYS AND SEND COMMANDS'''
-    
+
         self.master.busy()
         step = 0.2
         key = event.keysym.lower()
-        commands = {'w':'X-', 's':'X', 'a':'Y-', 'd':'Y', 'j':'Z-','k':'Z'}
+        commands = {
+                'w': 'X-', 's': 'X', 'a': 'Y-',
+                'd': 'Y', 'j': 'Z-', 'k': 'Z'}
 
         if key == 'h':
             self.go_home()
@@ -160,38 +165,47 @@ class Robot:
                 self.relative_mode()
             else:
                 self.absolute_mode()
-            
+
         elif key in commands.keys() and not self.absolute:
             self.void_write(f'G0 {commands[key]}{step}')
         self.master.not_busy()
 
     def go_to(self, x=None, y=None, z=None):
         '''IF PASSED, THEN MOVES TO THERE IN ABS COORDINATES'''
-        
-        if x: self.void_write(f'G0 X{x}')
-        if y: self.void_write(f'G0 Y{y}')
-        if z: self.void_write(f'G0 Z{z}')
+
+        if x:
+            self.void_write(f'G0 X{x}')
+        if y:
+            self.void_write(f'G0 Y{y}')
+        if z:
+            self.void_write(f'G0 Z{z}')
 
     def wait_to(self, x=None, y=None, z=None):
         '''THIS METHOD WAITS UNTIL THE ROBOT IS IN THE GIVEN
         COORDINATES'''
         limit = 0
-        if x: limit+=1
-        if y: limit+=1
-        if z: limit+=1
+        if x:
+            limit += 1
+        if y:
+            limit += 1
+        if z:
+            limit += 1
 
         while True:
             axis = 0
-            if x and self.x_pos == x: axis+=1
-            if y and self.y_pos == y: axis+=1
-            if z and self.z_pos == z: axis+=1
-            if axis == limit: break
+            if x and self.x_pos == x:
+                axis += 1
+            if y and self.y_pos == y:
+                axis += 1
+            if z and self.z_pos == z:
+                axis += 1
+            if axis == limit:
+                break
             sleep(0.1)
 
     def go_home(self):
         '''MOVES THE ROBOT TO THE HOME'''
 
-        self.master.update()
         self.response_write('$H')
         self.master.set_message('Robot on origin')
 
@@ -220,7 +234,7 @@ class Robot:
 
         while self.is_connected:
             try:
-                resp = self.get_coordinates() 
+                resp = self.get_coordinates()
                 if resp:
                     xax, yax, zax = resp
                     self.x_pos = round(float(xax), 1)
@@ -232,5 +246,5 @@ class Robot:
             finally:
                 sleep(0.1)
 
-    def __del__(self):
-        self.robot.close()
+    def close(self):
+        self.arduino.close()
