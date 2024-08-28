@@ -30,7 +30,7 @@ class VideoFrame(CTkFrame):
         ''' RECIBES AN IMAGE, THEN CONVERTS TO CTK IMAGE
         AND FINALLY SHOWS IT IN CTKLABEL '''
         height, width = image.shape[:2]
-        
+
         center_x, center_y = width // 2, height // 2
 
         circle(
@@ -57,7 +57,6 @@ class VideoFrame(CTkFrame):
         ''' READS AN DEFAULT IMAGE TO SHOW UNTIL CAMERA IS
         CONNECTED '''
 
-        scale = 0.8
         img = imread('/home/user/autonomous_sowing_system/theSower/stage2/.theme/default.jpg')
         height, width = img.shape[:2]
         new_size = (1280, 720)
