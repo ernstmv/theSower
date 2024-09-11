@@ -29,6 +29,7 @@ class VideoFrame(CTkFrame):
 
         ''' RECIBES AN IMAGE, THEN CONVERTS TO CTK IMAGE
         AND FINALLY SHOWS IT IN CTKLABEL '''
+        image = cvtColor(image, COLOR_BGR2RGB)
         height, width = image.shape[:2]
 
         center_x, center_y = width // 2, height // 2
@@ -37,19 +38,22 @@ class VideoFrame(CTkFrame):
             image, (center_x, center_y),
             1, (0, 0, 255), 1)
 
-        image = self.convert_image(image)
+        image = self.convert_image(image, 1)
         self.video_label.configure(text='', image=image)
 
-    def convert_image(self, image):
+    def set_graph(self, graph):
+        graph = self.convert_image(graph, 1.5)
+        self.video_label.configure(text='', image=graph)
+
+    def convert_image(self, img, scale):
 
         ''' TAKES AND IMAGE, THEN CONVERTS IT TO PIL.IMAGE
         AND FINALLY TO CTKIMAGE '''
 
-        img = cvtColor(image, COLOR_BGR2RGB)
         img_pil = Image.fromarray(img)
         img_ctk = CTkImage(
                 light_image=img_pil,
-                size=(img.shape[1], img.shape[0]))
+                size=(img.shape[1]*scale, img.shape[0]*scale))
         return img_ctk
 
     def load_default_image(self):
@@ -58,7 +62,6 @@ class VideoFrame(CTkFrame):
         CONNECTED '''
 
         img = imread('/home/user/autonomous_sowing_system/theSower/stage2/.theme/default.jpg')
-        height, width = img.shape[:2]
         new_size = (1280, 720)
         img = resize(img, new_size, interpolation=INTER_AREA)
         self.set_image(img)

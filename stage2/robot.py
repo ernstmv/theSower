@@ -152,11 +152,12 @@ class Robot:
         '''THIS FUNCTION INTERPRETS THE KEYS AND SEND COMMANDS'''
 
         self.master.busy()
-        step = 0.2
+        step = 0.7
         key = event.keysym.lower()
-        commands = {
+        commandsxy = {
                 'w': 'X-', 's': 'X', 'a': 'Y-',
-                'd': 'Y', 'j': 'Z-', 'k': 'Z'}
+                'd': 'Y'}
+        commandsz = {'j': 'Z-', 'k': 'Z'}
 
         if key == 'h':
             self.go_home()
@@ -165,10 +166,23 @@ class Robot:
                 self.relative_mode()
             else:
                 self.absolute_mode()
-
-        elif key in commands.keys() and not self.absolute:
-            self.void_write(f'G0 {commands[key]}{step}')
+        elif key == 'p':
+            self.response_write('M15')
+        elif key in commandsxy.keys() and not self.absolute:
+            self.void_write(f'G0 {commandsxy[key]}{step}')
+        elif key in commandsz.keys() and not self.absolute:
+            self.void_write(f'G0 {commandsz[key]}{0.2}')
         self.master.not_busy()
+
+    def complex_movement(self, x=0, y=0, z=0):
+        if x:
+            if y:
+                if z:
+                    self.void_write(f'G0 X{x} Y{y} Z{z}')
+                else:
+                    self.void_write(f'G0 X{x} Y{y}')
+            else:
+                self.void_write(f'G0 X{x}')
 
     def go_to(self, x=None, y=None, z=None):
         '''IF PASSED, THEN MOVES TO THERE IN ABS COORDINATES'''
@@ -206,7 +220,7 @@ class Robot:
     def go_home(self):
         '''MOVES THE ROBOT TO THE HOME'''
 
-        self.response_write('$H')
+        self.void_write('$H')
         self.master.set_message('Robot on origin')
 
     def pause(self, n):
@@ -233,6 +247,7 @@ class Robot:
         '''THIS FUNCTION UPDATES DE GUI WITH THE NEW ROBOT COORDINATES'''
 
         while self.is_connected:
+            sleep(0.1)
             try:
                 resp = self.get_coordinates()
                 if resp:

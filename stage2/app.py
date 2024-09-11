@@ -116,8 +116,10 @@ class App(CTk):
             self.camera = None
 
     def camera_on(self):
+        '''UPDATES BUTTONS FRAME AND CHECK IF BOTH DEVICES ARE AVAILABLE'''
         self.buttons_frame.camera_on()
         self.buttons_frame.to_play()
+        self.check_available()
 
     def disconnect_camera(self):
         del self.camera
@@ -127,6 +129,7 @@ class App(CTk):
     def camera_off(self):
         self.buttons_frame.camera_off()
         self.buttons_frame.disable_camera()
+        self.buttons_frame.disable_auto()
         self.set_message("Camera disconnected")
 
     def play_video(self):
@@ -167,9 +170,11 @@ class App(CTk):
 
     def robot_on(self):
         self.buttons_frame.robot_on()
+        self.check_available()
 
     def robot_off(self):
         self.buttons_frame.robot_off()
+        self.buttons_frame.disable_auto()
         self.set_message('Robot disconnected')
 
     # --------------FRAME-METHODS----------------------------------
@@ -194,31 +199,29 @@ class App(CTk):
     def autoseed(self):
         '''STARTS AUTOSEED SECUENCE'''
         self.busy()
-        Thread(target=self.start_clock).start()
 
-        self.auto = Autoset(
-                self, self.visualize_frame,
-                self.z_scan, self.plating_depth, self.z_tray)
+        try:
+            self.auto = Autoset(
+                    self, self.vis_frame,
+                    self.z_scan, self.planting_depth, self.z_tray)
+        except Exception as e:
+            print(e)
+            self.set_message('One or more data was not configured')
+
         self.auto.auto()
 
-        self.stop_clock()
         self.not_busy()
 
-    def start_clock(self):
-        self.stop_clock = False
-        seconds = 0
-        minutes = 0
-        while not self.stop_clock:
-            self.info_frame.set_time(
-                f'{minutes}:{seconds}')
-            sleep(1)
-            seconds += 1
-            if seconds == 60:
-                minutes += 1
-                seconds = 0
+    def stop_auto(self):
+        pass
+    # ------------------------------OTHER-METHODS-----------------------------
 
-    def stop_clock(self):
-        self.stop_clock = True
+    def save_data(self):
+        pass
+
+    def check_available(self):
+        if self.camera and self.robot:
+            self.buttons_frame.to_auto()
 
     def switch_frame(self, choice):
         idx = self.frames_icons.index(choice)
@@ -228,3 +231,6 @@ class App(CTk):
             self.conf_frame.tkraise()
         elif idx == 2:
             self.data_frame.tkraise()
+
+    def set_graph(self, graph):
+        self.video_frame.set_graph(graph)

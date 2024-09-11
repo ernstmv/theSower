@@ -1,5 +1,5 @@
 from customtkinter import (
-        CTkFrame, CTkLabel, CTkButton, CTkImage, CTkEntry, CTkProgressBar)
+        CTkFrame, CTkLabel, CTkImage, CTkEntry, CTkProgressBar)
 from PIL import Image
 from cv2 import cvtColor, COLOR_BGR2RGB
 
@@ -14,7 +14,6 @@ class VisualizeFrame(CTkFrame):
         self.date_label = CTkLabel(self, text='Date:')
         self.crop_label = CTkLabel(self, text='Crop:')
         self.greenhouse_label = CTkLabel(self, text='Greenhouse:')
-        self.tray_label = CTkLabel(self, text='Tray ID:')
         self.viable_label = CTkLabel(self, text='Viable holes:')
         self.sown_label = CTkLabel(self, text='Sown holes:')
         self.time_label = CTkLabel(self, text='Time:')
@@ -24,17 +23,14 @@ class VisualizeFrame(CTkFrame):
         self.crop_label.grid(row=1, column=0, padx=10, pady=10, sticky='w')
         self.greenhouse_label.grid(
                 row=2, column=0, padx=10, pady=10, sticky='w')
-        self.tray_label.grid(row=3, column=0, padx=10, pady=10, sticky='w')
-        self.viable_label.grid(row=4, column=0, padx=10, pady=10, sticky='w')
-        self.sown_label.grid(row=5, column=0, padx=10, pady=10, sticky='w')
-        self.time_label.grid(row=6, column=0, padx=10, pady=10, sticky='w')
-        self.progress_label.grid(
-                row=7, column=0, padx=10, pady=10, sticky='w')
+        self.viable_label.grid(row=3, column=0, padx=10, pady=10, sticky='w')
+        self.sown_label.grid(row=4, column=0, padx=10, pady=10, sticky='w')
+        self.time_label.grid(row=5, column=0, padx=10, pady=10, sticky='w')
+        self.progress_label.grid(row=6, column=0, padx=10, pady=10, sticky='w')
 
         self.date_entry = CTkEntry(self, state='disabled')
         self.crop_entry = CTkEntry(self, state='disabled')
         self.greenhouse_entry = CTkEntry(self, state='disabled')
-        self.tray_entry = CTkEntry(self, state='disabled')
         self.viable_entry = CTkEntry(self, state='disabled')
         self.sown_entry = CTkEntry(self, state='disabled')
         self.time_entry = CTkEntry(self, state='disabled')
@@ -46,18 +42,12 @@ class VisualizeFrame(CTkFrame):
                 row=2, column=1,
                 padx=10, pady=10,
                 sticky='w')
-        self.tray_entry.grid(row=3, column=1, padx=10, pady=10, sticky='w')
-        self.viable_entry.grid(row=4, column=1, padx=10, pady=10, sticky='w')
-        self.sown_entry.grid(row=5, column=1, padx=10, pady=10, sticky='w')
-        self.time_entry.grid(row=6, column=1, padx=10, pady=10, sticky='w')
-        self.progress_bar.grid(row=7, column=1, padx=10, pady=10, sticky='ew')
+        self.viable_entry.grid(row=3, column=1, padx=10, pady=10, sticky='w')
+        self.sown_entry.grid(row=4, column=1, padx=10, pady=10, sticky='w')
+        self.time_entry.grid(row=5, column=1, padx=10, pady=10, sticky='w')
+        self.progress_bar.grid(row=6, column=1, padx=10, pady=10, sticky='ew')
 
-        self.graph_image = CTkLabel(self)
-        self.graph_image.grid(
-                row=8, column=0,
-                columnspan=2,
-                padx=10, pady=10,
-                sticky='nsew')
+        self.progress_bar.set(0)
 
     def set_date(self, date):
         self.date_entry.configure(state='normal')
@@ -102,7 +92,7 @@ class VisualizeFrame(CTkFrame):
         self.time_entry.configure(state='disabled')
 
     def set_progress(self, progress):
-        self.progress_bar.set(progress/100)
+        self.progress_bar.set(progress)
 
     def set_graph(self, graph):
         graph = self.convert(graph)
