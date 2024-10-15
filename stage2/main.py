@@ -4,7 +4,7 @@ from app import App
 
 def main():
     set_appearance_mode('dark')
-    set_default_color_theme('/home/user/autonomous_sowing_system/theSower/stage2/.theme/theme.json')
+    set_default_color_theme('/home/user/theSower/stage2/.theme/theme.json')
     app = App()
     app.mainloop()
 

@@ -1,11 +1,8 @@
 from customtkinter import CTk, CTkSegmentedButton, CTkLabel
-from time import sleep
-from threading import Thread
 
 from headerFrame import HeaderFrame
 from visualizeFrame import VisualizeFrame
 from configFrame import ConfigFrame
-from dataFrame import DataFrame
 from videoFrame import VideoFrame
 from buttonsFrame import ButtonsFrame
 from logFrame import LogFrame
@@ -26,10 +23,10 @@ class App(CTk):
         self.grid_rowconfigure((0, 1, 2), weight=1)
         self.grid_columnconfigure((0, 1, 2), weight=1)
 
-        self.frames_icons = [' ', ' ', ' ']
+        self.frames_icons = [' ', ' ']
         mssg = 'Universidad Autonoma Chapingo\nCIIARAA DIMA\n2024'
 
-        self.title('The Sower')
+        self.title('theSower')
         self.stop_video = False
         self.stop_clock = False
         self.camera = None
@@ -38,11 +35,12 @@ class App(CTk):
         self.z_scan = None
         self.planting_depth = None
         self.z_tray = None
+        self.crop = None
+        self.greenhouse = None
 
         self.header_frame = HeaderFrame(self)
         self.vis_frame = VisualizeFrame(self)
         self.conf_frame = ConfigFrame(self)
-        self.data_frame = DataFrame(self)
         self.video_frame = VideoFrame(self)
         self.buttons_frame = ButtonsFrame(self)
         self.log_frame = LogFrame(self)
@@ -55,12 +53,6 @@ class App(CTk):
                 row=0, column=0,
                 padx=10, pady=10,
                 sticky='ew')
-
-        self.data_frame.grid(
-                row=1, column=0,
-                rowspan=4,
-                padx=10, pady=10,
-                sticky='nsew')
 
         self.conf_frame.grid(
                 row=1, column=0,
@@ -130,22 +122,20 @@ class App(CTk):
         self.buttons_frame.camera_off()
         self.buttons_frame.disable_camera()
         self.buttons_frame.disable_auto()
-        self.set_message("Camera disconnected")
+        self.set_message("Camara desconectada")
 
     def play_video(self):
-        if self.camera:
-            self.buttons_frame.to_pause()
-            self.stop_video = False
-            while not self.stop_video:
-                img = self.camera.get_image()
-                if img is None:
-                    self.disconnect_camera()
-                    self.set_message('Cannot get image, camera error')
-                    break
+        self.buttons_frame.to_pause()
+        self.stop_video = False
+        while not self.stop_video:
+            img = self.camera.get_image()
+            try:
                 self.set_image(img)
-                self.update()
-        else:
-            self.set_message("Error in camera")
+            except Exception:
+                self.disconnect_camera()
+                self.set_message("Error en la camara")
+                self.stop_video = True
+            self.update()
 
     def pause_video(self):
         self.stop_video = True
@@ -175,7 +165,7 @@ class App(CTk):
     def robot_off(self):
         self.buttons_frame.robot_off()
         self.buttons_frame.disable_auto()
-        self.set_message('Robot disconnected')
+        self.set_message('Robot desconectado')
 
     # --------------FRAME-METHODS----------------------------------
 
@@ -204,11 +194,12 @@ class App(CTk):
             self.auto = Autoset(
                     self, self.vis_frame,
                     self.z_scan, self.planting_depth, self.z_tray)
-        except Exception as e:
-            print(e)
-            self.set_message('One or more data was not configured')
+            self.vis_frame.set_crop(self.crop)
+            self.vis_frame.set_greenhouse(greenhouse)
+            self.auto.auto()
 
-        self.auto.auto()
+        except Exception as e:
+            self.set_message('Error en el proceso, revise los parametros')
 
         self.not_busy()
 
@@ -229,8 +220,6 @@ class App(CTk):
             self.vis_frame.tkraise()
         elif idx == 1:
             self.conf_frame.tkraise()
-        elif idx == 2:
-            self.data_frame.tkraise()
 
     def set_graph(self, graph):
         self.video_frame.set_graph(graph)

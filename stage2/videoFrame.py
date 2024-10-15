@@ -61,7 +61,7 @@ class VideoFrame(CTkFrame):
         ''' READS AN DEFAULT IMAGE TO SHOW UNTIL CAMERA IS
         CONNECTED '''
 
-        img = imread('/home/user/autonomous_sowing_system/theSower/stage2/.theme/default.jpg')
+        img = imread('/home/user/theSower/stage2/.theme/default.jpg')
         new_size = (1280, 720)
         img = resize(img, new_size, interpolation=INTER_AREA)
         self.set_image(img)

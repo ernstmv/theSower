@@ -11,8 +11,8 @@ class ButtonsFrame(CTkFrame):
         self.grid_columnconfigure((0, 1, 2, 3, 4, 5), weight=1)
         self.grid_rowconfigure((0, 1), weight=1)
 
-        self.play_button = CTkButton(self, text='Play', state='disabled')
-        self.auto_button = CTkButton(self, text='Autoseed', state='disabled')
+        self.play_button = CTkButton(self, text='Reproducir', state='disabled')
+        self.auto_button = CTkButton(self, text='Sembrar', state='disabled')
         self.is_camera = CTkButton(self)
         self.is_robot = CTkButton(self)
         self.is_busy = CTkButton(self, state='disabled')
@@ -53,7 +53,7 @@ class ButtonsFrame(CTkFrame):
         '''WHEN CAMERA IS CONNECTED, CONFIGURES COLOR IN GREEN'''
 
         self.is_camera.configure(
-                text='Camera online',
+                text='Camara conectada',
                 fg_color='#262626',
                 border_width=1,
                 border_color='#00E069',
@@ -64,7 +64,7 @@ class ButtonsFrame(CTkFrame):
         '''WHEN CAMERA IS DISCONNECTED, CONFIGURES COLOR IN RED'''
 
         self.is_camera.configure(
-                text='Camera offline',
+                text='Camara desconectada',
                 fg_color='#262626',
                 border_width=1,
                 border_color='#CC1100',
@@ -88,7 +88,7 @@ class ButtonsFrame(CTkFrame):
         PUTS IN PLAY'''
 
         self.play_button.configure(
-                text='Play video', command=self.play_video, state='normal')
+                text='Reproducir', command=self.play_video, state='normal')
 
     def play_video(self):
         '''CALL THE PLAY VIDEO METHOD FROM
@@ -103,7 +103,7 @@ class ButtonsFrame(CTkFrame):
         PUTS IT IN PAUSE'''
 
         self.play_button.configure(
-                text='Stop video', command=self.pause_video, state='normal')
+                text='Detener video', command=self.pause_video, state='normal')
 
     def pause_video(self):
         '''STOPS THE VIDEO REPRODUCTION
@@ -123,7 +123,7 @@ class ButtonsFrame(CTkFrame):
 
     def robot_on(self):
         self.is_robot.configure(
-                text='Robot online',
+                text='Robot conectado',
                 fg_color='#262626',
                 border_width=1,
                 border_color='#00E069',
@@ -132,7 +132,7 @@ class ButtonsFrame(CTkFrame):
 
     def robot_off(self):
         self.is_robot.configure(
-                text='Robot offline',
+                text='Robot desconectado',
                 fg_color='#262626',
                 border_width=1,
                 border_color='#CC1100',
@@ -149,11 +149,11 @@ class ButtonsFrame(CTkFrame):
 
     def to_auto(self):
         self.auto_button.configure(
-                text='Autoseed', command=self.auto, state='normal')
+                text='Sembrar', command=self.auto, state='normal')
 
     def to_stop(self):
         self.auto_button.configure(
-                text='Stop sequence', command=self.stop, state='normal')
+                text='Detener siembra', command=self.stop, state='normal')
 
     def auto(self):
         self.master.autoseed()
@@ -171,7 +171,7 @@ class ButtonsFrame(CTkFrame):
 
     def busy(self):
         self.is_busy.configure(
-                text='Busy',
+                text='Ocupado',
                 fg_color='#262626',
                 border_width=1,
                 text_color_disabled='#A10D00',
@@ -179,7 +179,7 @@ class ButtonsFrame(CTkFrame):
 
     def not_busy(self):
         self.is_busy.configure(
-                text='Available',
+                text='Disponible',
                 fg_color='#262626',
                 border_width=1,
                 text_color_disabled='#00E069',

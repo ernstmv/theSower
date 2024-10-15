@@ -38,4 +38,4 @@ class LogFrame(CTkFrame):
         '''
         SHOWS A GREETING MESSAGE
         '''
-        self.set_message('Welcome to The Sower')
+        self.set_message('Bienvenido')

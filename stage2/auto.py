@@ -1,16 +1,15 @@
 from cv2 import (
             cvtColor, COLOR_RGB2HSV, addWeighted, inRange, GaussianBlur,
             findContours, RETR_EXTERNAL, CHAIN_APPROX_NONE,
-            boundingRect, rectangle)
+            boundingRect, rectangle, imwrite)
 
 import matplotlib.pyplot as plt
 
 from numpy import array, zeros_like, frombuffer, uint8
 
 from threading import Thread
+from datetime import datetime
 from time import sleep
-
-from statistics import mode
 
 
 class Autoset:
@@ -38,15 +37,16 @@ class Autoset:
         self.is_working = False
         self.stop_clock = False
 
-        self.z_scan = -14
-        self.planting_depth = -5
-        self.z_tray = -24
+        self.z_scan = z_scan
+        self.planting_depth = planting_depth 
+        self.z_tray = z_tray
 
     def auto(self):
         '''AUTOSEED SEQUENCE'''
 
         Thread(target=self.start_sequence).start()
         Thread(target=self.start_clock).start()
+        Thread(target=self.capture_images).start()
 
         self.is_working = True
         self.show_video = True
@@ -210,7 +210,7 @@ class Autoset:
 
         # ----------------------FILTRO-DE-COLOR---------------
         inf = array([0, 0, 0])
-        sup = array([90, 70, 120])
+        sup = array([150, 150, 150])
 
         img = GaussianBlur(self.img, (21, 21), 0)
 
@@ -227,7 +227,7 @@ class Autoset:
             x, y, w, h = boundingRect(cont)
             area = w * h
             r = h / w
-            if area < 14000 and area > 6000 and r > 0.8 and r < 1.2:
+            if area < 16000 and area > 4000 and r > 0.8 and r < 1.2:
                 holes.append(cont)
                 rectangle(self.mask, (x, y), (x+w, y+h), (0, 255, 0), -1)
 
@@ -397,7 +397,7 @@ class Autoset:
         fig.set_facecolor('#262626')
 
         ax.tick_params(axis='x', colors='yellow', which='both')
-        ax.tick_params(axis='y', colors='yellow', which='both') 
+        ax.tick_params(axis='y', colors='yellow', which='both')
 
         ax.spines['top'].set_edgecolor('yellow')
         ax.spines['right'].set_edgecolor('yellow')
@@ -415,3 +415,8 @@ class Autoset:
         img_np = img_np.reshape(fig.canvas.get_width_height()[::-1] + (3,))
         plt.close(fig)
         self.master.set_graph(img_np)
+
+    def capture_images(self):
+        sleep(2)
+        time = datetime.now().strftime("%H_%M_%S")
+        imwrite(f'{time}.jpg', self.img)

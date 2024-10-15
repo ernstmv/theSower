@@ -10,9 +10,6 @@ class HeaderFrame(CTkFrame):
         self.grid_columnconfigure((7, 8, 9, 10, 11), weight=0)
         self.grid_rowconfigure((0), weight=1)
 
-        greenhouses = [
-                'invernadero 1',
-                'invernadero 2']
         self.x_label = CTkLabel(self, text='X: ')
         self.x_entry = CTkEntry(self, state='disabled')
         self.y_label = CTkLabel(self, text='Y: ')
@@ -28,12 +25,10 @@ class HeaderFrame(CTkFrame):
         self.z_entry.grid(row=0, column=5, padx=10, pady=10, sticky='w')
 
         self.support_button = CTkButton(
-                self, text='Support', command=self.support_window)
-        self.greenh_menu = CTkOptionMenu(
-                self, values=greenhouses, command=self.select_greenh)
-        self.greenhouse_icon = CTkLabel(self, text='󰹖 ')
+                self, text='Soporte', command=self.support_window)
+
         self.user_button = CTkButton(
-                self, text='User',
+                self, text='Usuario',
                 command=self.user_window,
                 fg_color='#262626',
                 text_color='#fff',
@@ -41,8 +36,6 @@ class HeaderFrame(CTkFrame):
         self.user_icon = CTkLabel(self, text=' ')
 
         self.support_button.grid(row=0, column=7, padx=10, pady=5, sticky='e')
-        self.greenh_menu.grid(row=0, column=8, padx=10, pady=5)
-        self.greenhouse_icon.grid(row=0, column=9, padx=10, pady=5, sticky='e')
         self.user_button.grid(row=0, column=10, padx=10, pady=5)
         self.user_icon.grid(row=0, column=11, padx=10, pady=5, sticky='e')
 
@@ -68,9 +61,6 @@ class HeaderFrame(CTkFrame):
         pass
 
     def user_window(self):
-        pass
-
-    def select_greenh(self, choice):
         pass
 
     def set_coords(self, x, y, z):

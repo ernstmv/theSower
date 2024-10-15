@@ -1,4 +1,4 @@
-#!/home/user/autonomous_sowing_system/theSower/myenv/bin/python3
+#!/home/user/theSower/myenv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
