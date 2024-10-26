@@ -37,9 +37,9 @@ class Autoset:
         self.is_working = False
         self.stop_clock = False
 
-        self.z_scan = z_scan
-        self.planting_depth = planting_depth 
-        self.z_tray = z_tray
+        self.z_scan = -10
+        self.planting_depth = -3
+        self.z_tray = -21
 
     def auto(self):
         '''AUTOSEED SEQUENCE'''
@@ -210,7 +210,7 @@ class Autoset:
 
         # ----------------------FILTRO-DE-COLOR---------------
         inf = array([0, 0, 0])
-        sup = array([150, 150, 150])
+        sup = array([100, 100, 120])
 
         img = GaussianBlur(self.img, (21, 21), 0)
 
@@ -227,7 +227,7 @@ class Autoset:
             x, y, w, h = boundingRect(cont)
             area = w * h
             r = h / w
-            if area < 16000 and area > 4000 and r > 0.8 and r < 1.2:
+            if area < 16000 and area > 8000 and r > 0.8 and r < 1.2:
                 holes.append(cont)
                 rectangle(self.mask, (x, y), (x+w, y+h), (0, 255, 0), -1)
 

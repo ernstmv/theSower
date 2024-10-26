@@ -194,8 +194,8 @@ class App(CTk):
             self.auto = Autoset(
                     self, self.vis_frame,
                     self.z_scan, self.planting_depth, self.z_tray)
-            self.vis_frame.set_crop(self.crop)
-            self.vis_frame.set_greenhouse(greenhouse)
+            self.vis_frame.set_crop('Cilantro')
+            self.vis_frame.set_greenhouse("Invernadero de prueba")
             self.auto.auto()
 
         except Exception as e:
