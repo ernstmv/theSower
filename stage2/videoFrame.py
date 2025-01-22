@@ -1,9 +1,7 @@
-from customtkinter import (
-    CTkFrame, CTkLabel, CTkImage)
-from cv2 import (
-        cvtColor, COLOR_BGR2RGB, imread, resize,
-        INTER_AREA, circle)
+from customtkinter import CTkFrame, CTkLabel, CTkImage
+from cv2 import cvtColor, COLOR_BGR2RGB, imread, resize, INTER_AREA, circle
 from PIL import Image
+from os import getcwd
 
 
 class VideoFrame(CTkFrame):
@@ -29,23 +27,17 @@ class VideoFrame(CTkFrame):
 
         ''' RECIBES AN IMAGE, THEN CONVERTS TO CTK IMAGE
         AND FINALLY SHOWS IT IN CTKLABEL '''
+
         image = cvtColor(image, COLOR_BGR2RGB)
-        height, width = image.shape[:2]
-
-        center_x, center_y = width // 2, height // 2
-
-        circle(
-            image, (center_x, center_y),
-            1, (0, 0, 255), 1)
-
-        image = self.convert_image(image, 1)
+        image = self.convert_image(image)
         self.video_label.configure(text='', image=image)
 
     def set_graph(self, graph):
+
         graph = self.convert_image(graph, 1.5)
         self.video_label.configure(text='', image=graph)
 
-    def convert_image(self, img, scale):
+    def convert_image(self, img, scale=1):
 
         ''' TAKES AND IMAGE, THEN CONVERTS IT TO PIL.IMAGE
         AND FINALLY TO CTKIMAGE '''
@@ -61,7 +53,9 @@ class VideoFrame(CTkFrame):
         ''' READS AN DEFAULT IMAGE TO SHOW UNTIL CAMERA IS
         CONNECTED '''
 
-        img = imread('/home/user/theSower/stage2/.theme/default.jpg')
+        current_directory = getcwd()
         new_size = (1280, 720)
+
+        img = imread(current_directory + '/.theme/default.jpg')
         img = resize(img, new_size, interpolation=INTER_AREA)
         self.set_image(img)

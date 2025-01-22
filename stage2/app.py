@@ -71,15 +71,18 @@ class App(CTk):
                 padx=10, pady=10,
                 columnspan=2,
                 sticky='ew')
+
         self.video_frame.grid(
                 row=1, column=1,
                 columnspan=2,
                 padx=10, pady=10,
                 sticky='nsew')
+
         self.buttons_frame.grid(
                 row=2, column=1,
                 padx=10, pady=10,
                 sticky='ew')
+
         self.log_frame.grid(
                 row=2, column=2,
                 rowspan=2,
@@ -87,6 +90,7 @@ class App(CTk):
                 sticky='nsew')
 
         self.registered_label = CTkLabel(self, text=mssg)
+
         self.registered_label.grid(
                 row=3, column=1,
                 padx=10, pady=10,
@@ -205,6 +209,7 @@ class App(CTk):
 
     def stop_auto(self):
         pass
+
     # ------------------------------OTHER-METHODS-----------------------------
 
     def save_data(self):
