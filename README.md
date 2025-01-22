@@ -1,4 +1,4 @@
-#THE SOWER
+# THE SOWER
 ---
 ## Requisitos
 El manual de construccion del robot se encuentra en formato .docx y .pdf en la siguiente carpeta de Google drive. Ahi se describe en detalle todo el hardware requerido para ejecutar este proyecto.
