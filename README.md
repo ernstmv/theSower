@@ -1,7 +1,7 @@
 # THE SOWER
 ---
 ## Requisitos
-El manual de construccion del robot se encuentra en formato .docx y .pdf en la [siguiente carpeta de Google drive] (https://drive.google.com/drive/folders/1LAk44Pt5rw5dbCUJJe2iQZl9ppe9_0lu?usp=drive_link). Ahi se describe en detalle todo el hardware requerido para ejecutar este proyecto.
+El manual de construccion del robot se encuentra en formato .docx y .pdf en la [siguiente carpeta de Google drive](https://drive.google.com/drive/folders/1LAk44Pt5rw5dbCUJJe2iQZl9ppe9_0lu?usp=drive_link). Ahi se describe en detalle todo el hardware requerido para ejecutar este proyecto.
 
 ## Instalacion
 Este proyecto corre en una maquina Linux sin excepcion, pues la comunicacion con la camara se realiza a traves del firmware V4L2 (Video4Linux2) y un sistema de archivos estilo Unix. Adicionalmente el archivo `install.sh` se ejecuta en bash.
