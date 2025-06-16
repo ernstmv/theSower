@@ -56,6 +56,6 @@ class VideoFrame(CTkFrame):
         current_directory = getcwd()
         new_size = (1280, 720)
 
-        img = imread(current_directory + '/.theme/default.jpg')
+        img = imread(current_directory + '/.theme/default.png')
         img = resize(img, new_size, interpolation=INTER_AREA)
         self.set_image(img)

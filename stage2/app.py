@@ -1,4 +1,8 @@
+from datetime import datetime
+
 from customtkinter import CTk, CTkSegmentedButton, CTkLabel
+
+from support_window import SupportWindow
 
 from headerFrame import HeaderFrame
 from visualizeFrame import VisualizeFrame
@@ -24,7 +28,6 @@ class App(CTk):
         self.grid_columnconfigure((0, 1, 2), weight=1)
 
         self.frames_icons = [' ', ' ']
-        mssg = 'Universidad Autonoma Chapingo\nCIIARAA DIMA\n2024'
 
         self.title('theSower')
         self.stop_video = False
@@ -89,14 +92,17 @@ class App(CTk):
                 padx=10, pady=10,
                 sticky='nsew')
 
-        self.registered_label = CTkLabel(self, text=mssg)
-
-        self.registered_label.grid(
-                row=3, column=1,
-                padx=10, pady=10,
-                sticky='nsew')
-
         self.vis_frame.tkraise()
+        self.set_date()
+        self.vis_frame.set_crop('Cultivo de prueba')
+        self.vis_frame.set_greenhouse("Invernadero de prueba")
+
+    def set_date(self):
+        date = datetime.now().strftime("%Y/%m/%d")
+        self.vis_frame.set_date(date)
+
+    def launch_support_window(self):
+        _ = SupportWindow()
 
     # -------------------CAMERA-METHODS--------------------------
 
@@ -198,8 +204,6 @@ class App(CTk):
             self.auto = Autoset(
                     self, self.vis_frame,
                     self.z_scan, self.planting_depth, self.z_tray)
-            self.vis_frame.set_crop('Cilantro')
-            self.vis_frame.set_greenhouse("Invernadero de prueba")
             self.auto.auto()
 
         except Exception as e:

@@ -1,5 +1,4 @@
-from customtkinter import (
-        CTkFrame, CTkButton, CTkOptionMenu, CTkLabel, CTkEntry)
+from customtkinter import CTkFrame, CTkButton, CTkLabel, CTkEntry
 
 
 class HeaderFrame(CTkFrame):
@@ -28,11 +27,12 @@ class HeaderFrame(CTkFrame):
                 self, text='Soporte', command=self.support_window)
 
         self.user_button = CTkButton(
-                self, text='Usuario',
+                self, text='Ernesto R.',
                 command=self.user_window,
                 fg_color='#262626',
                 text_color='#fff',
-                hover_color='#F2D23A')
+                hover_color='#F2D23A',
+                state="disabled")
         self.user_icon = CTkLabel(self, text=' ')
 
         self.support_button.grid(row=0, column=7, padx=10, pady=5, sticky='e')
@@ -58,7 +58,7 @@ class HeaderFrame(CTkFrame):
         self.z_entry.configure(state='disabled')
 
     def support_window(self):
-        pass
+        self.master.launch_support_window()
 
     def user_window(self):
         pass

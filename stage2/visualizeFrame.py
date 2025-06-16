@@ -19,14 +19,14 @@ class VisualizeFrame(CTkFrame):
         self.time_label = CTkLabel(self, text='Tiempo:')
         self.progress_label = CTkLabel(self, text='Progreso:')
 
-        self.date_label.grid(row=0, column=0, padx=10, pady=10, sticky='w')
-        self.crop_label.grid(row=1, column=0, padx=10, pady=10, sticky='w')
+        self.date_label.grid(row=0, column=0, padx=10, pady=10, sticky='e')
+        self.crop_label.grid(row=1, column=0, padx=10, pady=10, sticky='e')
         self.greenhouse_label.grid(
-                row=2, column=0, padx=10, pady=10, sticky='w')
-        self.viable_label.grid(row=3, column=0, padx=10, pady=10, sticky='w')
-        self.sown_label.grid(row=4, column=0, padx=10, pady=10, sticky='w')
-        self.time_label.grid(row=5, column=0, padx=10, pady=10, sticky='w')
-        self.progress_label.grid(row=6, column=0, padx=10, pady=10, sticky='w')
+                row=2, column=0, padx=10, pady=10, sticky='e')
+        self.viable_label.grid(row=3, column=0, padx=10, pady=10, sticky='e')
+        self.sown_label.grid(row=4, column=0, padx=10, pady=10, sticky='e')
+        self.time_label.grid(row=5, column=0, padx=10, pady=10, sticky='e')
+        self.progress_label.grid(row=6, column=0, padx=10, pady=10, sticky='e')
 
         self.date_entry = CTkEntry(self, state='disabled')
         self.crop_entry = CTkEntry(self, state='disabled')
@@ -36,15 +36,15 @@ class VisualizeFrame(CTkFrame):
         self.time_entry = CTkEntry(self, state='disabled')
         self.progress_bar = CTkProgressBar(self, orientation='horizontal')
 
-        self.date_entry.grid(row=0, column=1, padx=10, pady=10, sticky='w')
-        self.crop_entry.grid(row=1, column=1, padx=10, pady=10, sticky='w')
+        self.date_entry.grid(row=0, column=1, padx=10, pady=10, sticky='ew')
+        self.crop_entry.grid(row=1, column=1, padx=10, pady=10, sticky='ew')
         self.greenhouse_entry.grid(
                 row=2, column=1,
                 padx=10, pady=10,
-                sticky='w')
-        self.viable_entry.grid(row=3, column=1, padx=10, pady=10, sticky='w')
-        self.sown_entry.grid(row=4, column=1, padx=10, pady=10, sticky='w')
-        self.time_entry.grid(row=5, column=1, padx=10, pady=10, sticky='w')
+                sticky='ew')
+        self.viable_entry.grid(row=3, column=1, padx=10, pady=10, sticky='ew')
+        self.sown_entry.grid(row=4, column=1, padx=10, pady=10, sticky='ew')
+        self.time_entry.grid(row=5, column=1, padx=10, pady=10, sticky='ew')
         self.progress_bar.grid(row=6, column=1, padx=10, pady=10, sticky='ew')
 
         self.progress_bar.set(0)
