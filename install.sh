@@ -13,7 +13,7 @@ fi
 echo "Virtual enviorment created"
 
 echo "[2/3] Activating virtual enviorment"
-source virtualenv/bin/activate
+. virtualenv/bin/activate
 
 if [ $? -ne 0 ]; then
   echo "ERROR: Cannot activate the virtual enviorment, Make sure your shell is neither bash or zsh"
