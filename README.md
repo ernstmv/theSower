@@ -6,30 +6,24 @@ El manual de construccion del robot se encuentra en formato .docx y .pdf en la [
 ## Instalacion
 Este proyecto corre en una maquina Linux sin excepcion, pues la comunicacion con la camara se realiza a traves del firmware V4L2 (Video4Linux2) y un sistema de archivos estilo Unix. Adicionalmente el archivo `install.sh` se ejecuta en bash.
 
-### 1.- Clona el repositorio
-En una terminal abierta en la carpeta en donde quieras guardar el archivo ejecuta:
-
-```
-git clone git@github.com:ernstmv/theSower.git
-```
-
-### 2.- Ejecuta el instalador
+### 1.- Ejecuta el instalador
 Muevete al repositorio clonado theSower con `cd`. Una vez ahi encontraras una archivo `.sh`. Ejecutalo usando:
 
 ```
-sh install.sh
+bash install.sh
 ```
 
 O con `chmod +x install.sh` seguido de `./install.sh`. Recibiras un mensaje que diga "Installation finished" cuando la instalacion se halla terminado sin errores.
 
 ### 3.- Activa el entorno virtual
 
-En el directorio actual encontraras un directorio `virtualenv`, para ejecutar este entorno virtual haz:
+En el directorio actual encontraras un directorio `virtualenv`, para activar este entorno ejecuta:
 
 ```
 source virutalenv/bin/activate
 ```
-Podrias necesitar usuar otro formato de archivo `activate` si usas fish u otro shell.
+
+Podrias necesitar otro formato de archivo `activate` si usas FISH u otro shell.
 
 ### 4.- Ejecuta el archivo
 
