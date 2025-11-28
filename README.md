@@ -27,7 +27,7 @@ Podrias necesitar otro formato de archivo `activate` si usas FISH u otro shell.
 
 ### 4.- Ejecuta el archivo
 
-La ultima version del codigo se encuentra en el directorio `stage2/`. Para ejecutarlo muevete nuevamente a esta carpeta con `cd` y ejecuta:
+La ultima version del codigo se encuentra en el directorio `src/`. Para ejecutarlo muevete nuevamente a esta carpeta con `cd` y ejecuta:
 
 ```
 python3 main.py
