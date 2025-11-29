@@ -1,5 +1,30 @@
 #! /bin/bash
 
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+else
+  echo "Cannot find /etc/os-release. Please proced manually"
+fi
+
+case $ID in
+  arch)
+    echo "You are cool"
+    sudo pacman -S --noconfirm python3 tk
+    ;;
+  ubuntu)
+    sudo apt install -y python3 python3-tk
+    ;;
+  fedora)
+    sudo dnf install -y python3 python3-tkinter
+    ;;
+  *)
+    echo "Distro not recognized, please add support to your distro in this script and send PR"
+    exit 1
+    ;;
+esac
+exit 0
+
+
 CURRENT_PATH=$(pwd)
 
 echo "[1/3] Creating virtual enviorment at $CURRENT_PATH"
@@ -29,4 +54,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "Libraries installed"
+echo "Libraries installed, you are done folk"
